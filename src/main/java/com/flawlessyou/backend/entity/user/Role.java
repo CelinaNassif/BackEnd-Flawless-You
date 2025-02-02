@@ -1,5 +1,5 @@
 package com.flawlessyou.backend.entity.user;
 
-enum Role {
-    REGULAR_USER, SKIN_EXPERT, ADMIN
+public enum Role {
+    USER, SKIN_EXPERT, ADMIN
 }

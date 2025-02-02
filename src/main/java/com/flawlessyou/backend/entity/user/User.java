@@ -16,25 +16,18 @@ public class User {
     private String skinType;
     @JsonIgnore
     private String hashedPassword;
-    private Role role;
+    public Role role;
     private String profilePicture;
     private LocalDate dateOfBirth;
     private List<String> skinAnalysisHistoryIds;// نتأكد منهم اذا سترنج ولا skinAnalisis
     private Set<String> savedProductIds;// نتأكد
     private List<String> reviewIds;// نتأكد
 
-    public User(String userId, String userName, String email, String phoneNumber, Gender gender, String skinType,
-            String hashedPassword, Role role, String profilePicture, LocalDate dateOfBirth) {
+    public User(String userId, String userName, String email) {
         this.userId = userId;
         this.userName = userName;
         this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.gender = gender;
-        this.skinType = skinType;
-        this.hashedPassword = hashedPassword;
-        this.role = role;
-        this.profilePicture = profilePicture;
-        this.dateOfBirth = dateOfBirth;
+   
     }
     public User(String userId, String userName, String email, String phoneNumber, Gender gender, String skinType,
             String hashedPassword, String profilePicture, LocalDate dateOfBirth) {

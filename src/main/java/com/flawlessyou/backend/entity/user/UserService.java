@@ -1,11 +1,9 @@
 package com.flawlessyou.backend.entity.user;
-// entity/user/UserService.java
 
 import com.google.cloud.firestore.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-// import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -16,11 +14,55 @@ public class UserService {
     
     private static final String COLLECTION_NAME = "users";
 
-    public void createUser(User user) throws ExecutionException, InterruptedException {
-        firestore.collection(COLLECTION_NAME)
-                .document(user.getUserId())
-                .set(user)
+    public boolean existsByUsername(String username) throws ExecutionException, InterruptedException {
+        Query query = firestore.collection(COLLECTION_NAME)
+                .whereEqualTo("username", username)
+                .limit(1);
+        
+        return !query.get().get().isEmpty();
+    }
+
+    public boolean existsByEmail(String email) throws ExecutionException, InterruptedException {
+        Query query = firestore.collection(COLLECTION_NAME)
+                .whereEqualTo("email", email)
+                .limit(1);
+        
+        return !query.get().get().isEmpty();
+    }
+
+    public void saveUser(User user) throws ExecutionException, InterruptedException {
+        DocumentReference docRef;
+        if (user.getUserId() == null || user.getUserId().isEmpty()) {
+            docRef = firestore.collection(COLLECTION_NAME).document();
+            user.setUserId(docRef.getId());
+        } else {
+            docRef = firestore.collection(COLLECTION_NAME).document(user.getUserId());
+        }
+        docRef.set(user).get();
+    }
+
+    public Optional<User> findByUsername(String username) throws ExecutionException, InterruptedException {
+        QuerySnapshot querySnapshot = firestore.collection(COLLECTION_NAME)
+                .whereEqualTo("username", username)
+                .limit(1)
+                .get()
                 .get();
+        
+        return querySnapshot.isEmpty() ? 
+                Optional.empty() : 
+                Optional.of(querySnapshot.getDocuments().get(0).toObject(User.class));
+    }
+
+    public Optional<User> findByEmail(String email) throws ExecutionException, InterruptedException {
+        QuerySnapshot querySnapshot = firestore.collection(COLLECTION_NAME)
+                .whereEqualTo("email", email)
+                .limit(1)
+                .get()
+                .get();
+        
+        return querySnapshot.isEmpty() ? 
+                Optional.empty() : 
+                Optional.of(querySnapshot.getDocuments().get(0).toObject(User.class));
     }
 
     public User getUserById(String userId) throws ExecutionException, InterruptedException {
@@ -29,13 +71,6 @@ public class UserService {
                 .get()
                 .get();
         
-        return document.toObject(User.class);
+        return document.exists() ? document.toObject(User.class) : null;
     }
-
-    // public List<User> getUsersBySkinType(String skinType) throws ExecutionException, InterruptedException {
-    //     Query query = firestore.collection(COLLECTION_NAME)
-    //             .whereEqualTo("skinType", skinType);
-        
-    //     return query.get().get().toObjects(User.class);
-    // }
 }

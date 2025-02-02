@@ -14,10 +14,10 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping
-    public void createUser(@RequestBody User user) throws Exception {
-        userService.createUser(user);
-    }
+    // @PostMapping
+    // public void createUser(@RequestBody User user) throws Exception {
+    //     userService.createUser(user);
+    // }
 
     @GetMapping("/{userId}")
     public User getUser(@PathVariable String userId) throws Exception {
