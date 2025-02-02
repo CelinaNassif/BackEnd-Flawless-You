@@ -1,0 +1,131 @@
+package com.flawlessyou.backend.entity.user;
+// import com.flawlessyou.backend.entity.user.Role;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+public class User {
+    private String userId;
+    private String userName;
+    private String email;
+    private String phoneNumber;
+    private Gender gender;
+    private String skinType;
+    @JsonIgnore
+    private String hashedPassword;
+    private Role role;
+    private String profilePicture;
+    private LocalDate dateOfBirth;
+    private List<String> skinAnalysisHistoryIds;// نتأكد منهم اذا سترنج ولا skinAnalisis
+    private Set<String> savedProductIds;// نتأكد
+    private List<String> reviewIds;// نتأكد
+
+    public User(String userId, String userName, String email, String phoneNumber, Gender gender, String skinType,
+            String hashedPassword, Role role, String profilePicture, LocalDate dateOfBirth) {
+        this.userId = userId;
+        this.userName = userName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.gender = gender;
+        this.skinType = skinType;
+        this.hashedPassword = hashedPassword;
+        this.role = role;
+        this.profilePicture = profilePicture;
+        this.dateOfBirth = dateOfBirth;
+    }
+    public User(String userId, String userName, String email, String phoneNumber, Gender gender, String skinType,
+            String hashedPassword, String profilePicture, LocalDate dateOfBirth) {
+        this.userId = userId;
+        this.userName = userName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.gender = gender;
+        this.skinType = skinType;
+        this.hashedPassword = hashedPassword;
+        this.profilePicture = profilePicture;
+        this.dateOfBirth = dateOfBirth;
+    }
+    public String getUserId() {
+        return userId;
+    }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+    public Gender getGender() {
+        return gender;
+    }
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+    public String getSkinType() {
+        return skinType;
+    }
+    public void setSkinType(String skinType) {
+        this.skinType = skinType;
+    }
+    public String getHashedPassword() {
+        return hashedPassword;
+    }
+    public void setHashedPassword(String hashedPassword) {
+        this.hashedPassword = hashedPassword;
+    }
+    public Role getRole() {
+        return role;
+    }
+    public void setRole(Role role) {
+        this.role = role;
+    }
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+    public List<String> getSkinAnalysisHistoryIds() {
+        return skinAnalysisHistoryIds;
+    }
+    public void setSkinAnalysisHistoryIds(List<String> skinAnalysisHistoryIds) {
+        this.skinAnalysisHistoryIds = skinAnalysisHistoryIds;
+    }
+    public Set<String> getSavedProductIds() {
+        return savedProductIds;
+    }
+    public void setSavedProductIds(Set<String> savedProductIds) {
+        this.savedProductIds = savedProductIds;
+    }
+    public List<String> getReviewIds() {
+        return reviewIds;
+    }
+    public void setReviewIds(List<String> reviewIds) {
+        this.reviewIds = reviewIds;
+    }
+  
+    
+}
