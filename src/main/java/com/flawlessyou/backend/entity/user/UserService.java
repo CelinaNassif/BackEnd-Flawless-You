@@ -16,7 +16,7 @@ public class UserService {
 
     public boolean existsByUsername(String username) throws ExecutionException, InterruptedException {
         Query query = firestore.collection(COLLECTION_NAME)
-                .whereEqualTo("username", username)
+                .whereEqualTo("userName", username)
                 .limit(1);
         
         return !query.get().get().isEmpty();
@@ -43,7 +43,7 @@ public class UserService {
 
     public Optional<User> findByUsername(String username) throws ExecutionException, InterruptedException {
         QuerySnapshot querySnapshot = firestore.collection(COLLECTION_NAME)
-                .whereEqualTo("username", username)
+                .whereEqualTo("userName", username)
                 .limit(1)
                 .get()
                 .get();
