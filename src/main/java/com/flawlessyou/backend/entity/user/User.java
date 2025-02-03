@@ -4,9 +4,12 @@ package com.flawlessyou.backend.entity.user;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.NoArgsConstructor;
+@NoArgsConstructor
 public class User {
     private String userId;
     private String userName;
@@ -23,15 +26,19 @@ public class User {
     private Set<String> savedProductIds;// نتأكد
     private List<String> reviewIds;// نتأكد
 
-    public User(String userId, String userName, String email) {
-        this.userId = userId;
+    public User( String userName, String email,  String hashedPassword) {
+       
+        this.userId = UUID.randomUUID().toString();
         this.userName = userName;
         this.email = email;
+        this.hashedPassword = hashedPassword;
+
    
     }
-    public User(String userId, String userName, String email, String phoneNumber, Gender gender, String skinType,
+    public User( String userName, String email, String phoneNumber, Gender gender, String skinType,
             String hashedPassword, String profilePicture, LocalDate dateOfBirth) {
-        this.userId = userId;
+                this.userId = UUID.randomUUID().toString();
+
         this.userName = userName;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -41,6 +48,7 @@ public class User {
         this.profilePicture = profilePicture;
         this.dateOfBirth = dateOfBirth;
     }
+  
     public String getUserId() {
         return userId;
     }
