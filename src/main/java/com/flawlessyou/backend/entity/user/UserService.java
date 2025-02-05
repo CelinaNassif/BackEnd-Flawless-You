@@ -73,4 +73,8 @@ public class UserService {
         
         return document.exists() ? document.toObject(User.class) : null;
     }
+    public void addProfilePicture(String userId, String profilePictureUrl) throws ExecutionException, InterruptedException {
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(userId);
+        docRef.update("profilePicture", profilePictureUrl).get();
+    }
 }
