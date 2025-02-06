@@ -28,6 +28,10 @@ import java.util.stream.Collectors;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import java.util.Collections;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth") 
@@ -142,4 +146,16 @@ public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest login
         }
         return null;
     }
+
+
+
+@GetMapping("/user")
+@ResponseBody
+public Map<String, Object> getUserDetails(@AuthenticationPrincipal OAuth2User principal) {
+    if (principal == null) {
+        return Collections.singletonMap("message", "User is not authenticated");
+    }
+    return Collections.singletonMap("name", principal.getAttribute("name"));
+}
+
 }
