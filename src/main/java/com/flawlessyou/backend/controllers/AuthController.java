@@ -3,6 +3,10 @@ package com.flawlessyou.backend.controllers;
 import com.flawlessyou.backend.entity.user.Role;
 import com.flawlessyou.backend.entity.user.User;
 import com.flawlessyou.backend.entity.user.UserService;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.flawlessyou.backend.Security.Jwt.JwtUtils;
 import com.flawlessyou.backend.Security.Services.UserDetailsImpl;
 import com.flawlessyou.backend.Payload.Request.LoginRequest;
@@ -19,6 +23,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import java.util.Optional;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -149,13 +160,55 @@ public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest login
 
 
 
-@GetMapping("/user")
-@ResponseBody
-public Map<String, Object> getUserDetails(@AuthenticationPrincipal OAuth2User principal) {
-    if (principal == null) {
-        return Collections.singletonMap("message", "User is not authenticated");
+// @GetMapping("/user")
+// @ResponseBody
+// public Map<String, Object> getUserDetails(@AuthenticationPrincipal OAuth2User principal) {
+//     if (principal == null) {
+//         return Collections.singletonMap("message", "User is not authenticated");
+//     }
+//     return Collections.singletonMap("name", principal.getAttribute("name"));
+// }
+@PostMapping("/google")
+public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String> request) {
+    try {
+        String idToken = request.get("idToken");
+
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
+                .setAudience(Collections.singletonList("631393157394-vocg3facesl3ur7mgnokqd11vjhiupql.apps.googleusercontent.com")) // ضع Client ID هنا
+                .build();
+
+        GoogleIdToken googleIdToken = verifier.verify(idToken);
+        if (googleIdToken == null) {
+            return ResponseEntity.badRequest().body("Invalid ID token");
+        }
+
+        Payload payload = googleIdToken.getPayload();
+        String email = payload.getEmail();
+
+        Optional<User> userOptional = userService.findByEmail(email);
+        User user;
+        if (userOptional.isPresent()) {
+            user = userOptional.get();
+        } else {
+            user = new User();
+            user.setEmail(email);
+            user.setUserName(payload.get("name").toString());
+            user.setRole(Role.USER);
+            userService.saveUser(user);
+        }
+
+        // تحويل User إلى UserDetailsImpl
+        UserDetailsImpl userDetails = UserDetailsImpl.build(user);
+
+        // إنشاء Authentication باستخدام UserDetailsImpl
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtils.generateJwtToken(authentication);
+
+        return ResponseEntity.ok(new JwtResponse(jwt, user.getUserId(), user.getUserName(), user.getEmail(), List.of(user.getRole().name())));
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Google authentication failed");
     }
-    return Collections.singletonMap("name", principal.getAttribute("name"));
 }
 
 }

@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.flawlessyou.backend.entity.user.Role;
 import com.flawlessyou.backend.entity.user.User;
 
 public class UserDetailsImpl implements UserDetails {
@@ -40,6 +41,9 @@ public class UserDetailsImpl implements UserDetails {
     // List<GrantedAuthority> authorities = user.role.stream()
     //     .map(role -> new SimpleGrantedAuthority(role.name()))
     //     .collect(Collectors.toList());
+    if (user.getRole() == null) {
+      user.setRole(Role.USER);
+  }
     GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
 
     return new UserDetailsImpl(
