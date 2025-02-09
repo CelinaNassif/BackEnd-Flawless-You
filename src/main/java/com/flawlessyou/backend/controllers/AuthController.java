@@ -19,134 +19,212 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import java.util.Optional;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.http.HttpStatus;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import java.util.Collections;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/auth") 
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @Autowired
-    PasswordEncoder encoder;
+    private PasswordEncoder encoder;
 
     @Autowired
-    JwtUtils jwtUtils;
+    private JwtUtils jwtUtils;
 
-    @PostMapping("/signin")
-public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-    try {
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
-                loginRequest.getPassword()
-            )
-        );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-        .map(GrantedAuthority::getAuthority)
-        .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(
-            jwt,
-            userDetails.getId(),
-            userDetails.getUsername(),
-            userDetails.getEmail(),
-            roles
-        ));
 
-     } catch (BadCredentialsException e) {
-        System.err.println("Bad credentials for user: " + loginRequest.getUsername());
-        return ResponseEntity.status(401).body("Invalid username/password");
-        
-    } catch (Exception e) {
-        System.err.println("Authentication error: " + e.getMessage());
-        e.printStackTrace();
-        return ResponseEntity.status(500).body("Internal server error");
+    @GetMapping("/swagger")
+    public RedirectView redirectToSwagger() {
+        return new RedirectView("/swagger-ui/index.html");
     }
+    @PostMapping("/signin")
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    loginRequest.getUsername(),
+                    loginRequest.getPassword()
+                )
+            );
 
-}
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication);
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+
+            return ResponseEntity.ok(new JwtResponse(
+                jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                roles
+            ));
+
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new MessageResponse("Invalid username or password"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new MessageResponse("An error occurred during authentication"));
+        }
+    }
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         try {
             if (userService.existsByUsername(signUpRequest.getUsername())) {
-                return ResponseEntity.badRequest().body(new MessageResponse("Username already taken!"));
+                return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Username is already taken!"));
             }
 
             if (userService.existsByEmail(signUpRequest.getEmail())) {
-                return ResponseEntity.badRequest().body(new MessageResponse("Email already in use!"));
+                return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Email is already in use!"));
             }
 
             User user = new User(
-                    signUpRequest.getUsername(),
-                    signUpRequest.getEmail(),
-                    encoder.encode(signUpRequest.getPassword())
+                signUpRequest.getUsername(),
+                signUpRequest.getEmail(),
+                encoder.encode(signUpRequest.getPassword())
             );
             user.setRole(Role.USER);
 
             userService.saveUser(user);
             return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 
-        } catch (ExecutionException | InterruptedException e) {
-            return ResponseEntity.internalServerError().body(new MessageResponse("Registration failed: " + e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new MessageResponse("Registration failed: " + e.getMessage()));
         }
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<?> getUserDetails(@AuthenticationPrincipal OAuth2User principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new MessageResponse("User is not authenticated"));
+        }
+        Map<String, Object> userDetails = new HashMap<>();
+        userDetails.put("name", principal.getAttribute("name"));
+        userDetails.put("email", principal.getAttribute("email"));
+        userDetails.put("picture", principal.getAttribute("picture"));
+        return ResponseEntity.ok(userDetails);
+    }
+
+    @PostMapping("/google")
+public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String> request) {
+    try {
+        String email = request.get("email");
+        String name = request.get("name");
+        String picture = request.get("picture");
+
+        // 1. التحقق من وجود البيانات الأساسية
+        if (email == null || email.isEmpty()) {
+            return ResponseEntity.badRequest()
+                .body(new MessageResponse("Email is required"));
+        }
+
+        // 2. البحث عن المستخدم بواسطة البريد الإلكتروني
+        Optional<User> userOptional = userService.findByEmail(email);
+        User user;
+
+        if (userOptional.isPresent()) {
+            user = userOptional.get();
+        } else {
+            // 3. إنشاء مستخدم جديد إذا لم يوجد
+            user = new User();
+            user.setEmail(email);
+            user.setUserName(name != null ? name : "User"); // اسم افتراضي إذا لم يوفر
+            user.setRole(Role.USER);
+            
+            if (picture != null) {
+                user.setProfilePicture(picture);
+            }
+            
+            userService.saveUser(user);
+        }
+
+        // 4. إنشاء مصادقة JWT يدوية
+        UserDetailsImpl userDetails = UserDetailsImpl.build(user);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            userDetails, 
+            null, 
+            userDetails.getAuthorities()
+        );
+        
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtils.generateJwtToken(authentication);
+
+        return ResponseEntity.ok(new JwtResponse(
+            jwt,
+            user.getUserId(),
+            user.getUserName(),
+            user.getEmail(),
+            List.of(user.getRole().name())
+        ));
+
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(new MessageResponse("Google authentication failed: " + e.getMessage()));
+    }
+}
     @PutMapping("/changePassword")
-    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> passwords, HttpServletRequest request) {
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> passwords,
+                                          HttpServletRequest request) {
         try {
             String oldPassword = passwords.get("oldPassword");
             String newPassword = passwords.get("newPassword");
-            String jwt = parseJwt(request);
+            
+            if (oldPassword == null || newPassword == null) {
+                return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Both old and new passwords are required"));
+            }
 
+            String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
                 User user = userService.findByUsername(username)
-                        .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
                 if (!encoder.matches(oldPassword, user.getHashedPassword())) {
-                    return ResponseEntity.badRequest().body(new MessageResponse("Incorrect old password"));
+                    return ResponseEntity.badRequest()
+                        .body(new MessageResponse("Current password is incorrect"));
                 }
 
                 user.setHashedPassword(encoder.encode(newPassword));
                 userService.saveUser(user);
                 return ResponseEntity.ok(new MessageResponse("Password changed successfully"));
             }
-            return ResponseEntity.badRequest().body(new MessageResponse("Invalid token"));
+            
+            return ResponseEntity.badRequest()
+                .body(new MessageResponse("Invalid or expired token"));
 
-        } catch (ExecutionException | InterruptedException e) {
-            return ResponseEntity.internalServerError().body(new MessageResponse("Error changing password"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new MessageResponse("Error changing password: " + e.getMessage()));
         }
     }
 
@@ -157,58 +235,4 @@ public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest login
         }
         return null;
     }
-
-
-
-// @GetMapping("/user")
-// @ResponseBody
-// public Map<String, Object> getUserDetails(@AuthenticationPrincipal OAuth2User principal) {
-//     if (principal == null) {
-//         return Collections.singletonMap("message", "User is not authenticated");
-//     }
-//     return Collections.singletonMap("name", principal.getAttribute("name"));
-// }
-@PostMapping("/google")
-public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String> request) {
-    try {
-        String idToken = request.get("idToken");
-
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
-                .setAudience(Collections.singletonList("631393157394-vocg3facesl3ur7mgnokqd11vjhiupql.apps.googleusercontent.com")) // ضع Client ID هنا
-                .build();
-
-        GoogleIdToken googleIdToken = verifier.verify(idToken);
-        if (googleIdToken == null) {
-            return ResponseEntity.badRequest().body("Invalid ID token");
-        }
-
-        Payload payload = googleIdToken.getPayload();
-        String email = payload.getEmail();
-
-        Optional<User> userOptional = userService.findByEmail(email);
-        User user;
-        if (userOptional.isPresent()) {
-            user = userOptional.get();
-        } else {
-            user = new User();
-            user.setEmail(email);
-            user.setUserName(payload.get("name").toString());
-            user.setRole(Role.USER);
-            userService.saveUser(user);
-        }
-
-        // تحويل User إلى UserDetailsImpl
-        UserDetailsImpl userDetails = UserDetailsImpl.build(user);
-
-        // إنشاء Authentication باستخدام UserDetailsImpl
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
-
-        return ResponseEntity.ok(new JwtResponse(jwt, user.getUserId(), user.getUserName(), user.getEmail(), List.of(user.getRole().name())));
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Google authentication failed");
-    }
-}
-
 }
