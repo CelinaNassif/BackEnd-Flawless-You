@@ -149,62 +149,55 @@ public class AuthController {
     }
 
     @PostMapping("/google")
-public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String> request) {
-    try {
-        String email = request.get("email");
-        String name = request.get("name");
-        String picture = request.get("picture");
-
-        // 1. التحقق من وجود البيانات الأساسية
-        if (email == null || email.isEmpty()) {
-            return ResponseEntity.badRequest()
-                .body(new MessageResponse("Email is required"));
-        }
-
-        // 2. البحث عن المستخدم بواسطة البريد الإلكتروني
-        Optional<User> userOptional = userService.findByEmail(email);
-        User user;
-
-        if (userOptional.isPresent()) {
-            user = userOptional.get();
-        } else {
-            // 3. إنشاء مستخدم جديد إذا لم يوجد
-            user = new User();
+    public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            String name = request.get("name");
+            String picture = request.get("picture");
+    
+            // 1. التحقق من وجود البيانات الأساسية
+            if (email == null || email.isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Email is required"));
+            }
+    
+            // 2. إنشاء مستخدم مؤقت (بدون حفظه في قاعدة البيانات)
+            User user = new User();
             user.setEmail(email);
             user.setUserName(name != null ? name : "User"); // اسم افتراضي إذا لم يوفر
-            user.setRole(Role.USER);
+            user.setRole(Role.USER); // افتراضي
+            user.setProfilePicture(picture); // إذا كانت الصورة متوفرة
+    
+            // 3. إنشاء مصادقة JWT يدوية
+            UserDetailsImpl userDetails = UserDetailsImpl.build(user);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                userDetails, 
+                null, 
+                userDetails.getAuthorities()
+            );
             
-            if (picture != null) {
-                user.setProfilePicture(picture);
-            }
-            
-            userService.saveUser(user);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication);
+    
+            // 4. إرجاع معلومات المستخدم مع الـ JWT كـ Map
+            Map<String, Object> userInfo = new HashMap<>();
+            userInfo.put("userId", null); // لا يوجد معرف مستخدم لأنه لم يتم حفظه
+            userInfo.put("userName", user.getUserName());
+            userInfo.put("email", user.getEmail());
+            userInfo.put("profilePicture", user.getProfilePicture());
+            userInfo.put("role", user.getRole().name());
+    
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", jwt);
+            response.put("userInfo", userInfo);
+    
+            return ResponseEntity.ok(response);
+    
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new MessageResponse("Google authentication failed: " + e.getMessage()));
         }
-
-        // 4. إنشاء مصادقة JWT يدوية
-        UserDetailsImpl userDetails = UserDetailsImpl.build(user);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-            userDetails, 
-            null, 
-            userDetails.getAuthorities()
-        );
-        
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
-
-        return ResponseEntity.ok(new JwtResponse(
-            jwt,
-            user.getUserId(),
-            user.getUserName(),
-            user.getEmail(),
-            List.of(user.getRole().name())
-        ));
-
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(new MessageResponse("Google authentication failed: " + e.getMessage()));
     }
-}
     @PutMapping("/changePassword")
     public ResponseEntity<?> changePassword(@RequestBody Map<String, String> passwords,
                                           HttpServletRequest request) {
