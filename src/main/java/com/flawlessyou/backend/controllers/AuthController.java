@@ -54,10 +54,24 @@ public class AuthController {
 
 
 
-    @GetMapping("/swagger")
-    public RedirectView redirectToSwagger() {
-        return new RedirectView("/swagger-ui/index.html");
-    }
+    // @GetMapping("/swagger-ui")
+    // public ResponseEntity<Object> redirectToSwagger() {
+     
+    //     Authentication authentication = authenticationManager.authenticate(
+    //         new UsernamePasswordAuthenticationToken("mai", "password123")
+    //     );
+
+    //     SecurityContextHolder.getContext().setAuthentication(authentication);
+
+    //     String token = jwtUtils.generateJwtToken(authentication);
+
+    //     HttpHeaders headers = new HttpHeaders();
+    //     headers.add("Authorization", "Bearer " + token);
+    //     headers.add("Location", "/index.html");
+
+    //     return new ResponseEntity<>(headers, HttpStatus.FOUND);
+    // }
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         try {

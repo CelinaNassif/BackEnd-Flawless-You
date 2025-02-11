@@ -122,8 +122,14 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             auth
             .requestMatchers(WHITE_LIST_URL).permitAll()
             .requestMatchers("/oauth2/**", "/login/**").permitAll()
-                .requestMatchers("/swagger-ui/**","/v3/api-docs/**").permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()  
+            .requestMatchers(
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-resources/**",
+                "/webjars/**"
+            ).permitAll()
+                          .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/oauth2/callback/**").permitAll()
                 .anyRequest().authenticated()
               
