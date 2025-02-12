@@ -2,6 +2,7 @@ package com.flawlessyou.backend.controllers;
 
 import com.flawlessyou.backend.entity.user.Role;
 import com.flawlessyou.backend.entity.user.User;
+import com.flawlessyou.backend.entity.user.UserResponse;
 import com.flawlessyou.backend.entity.user.UserService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -148,56 +149,59 @@ public class AuthController {
         return ResponseEntity.ok(userDetails);
     }
 
-    @PostMapping("/google")
-    public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String> request) {
-        try {
-            String email = request.get("email");
-            String name = request.get("name");
-            String picture = request.get("picture");
-    
-            // 1. التحقق من وجود البيانات الأساسية
-            if (email == null || email.isEmpty()) {
-                return ResponseEntity.badRequest()
-                    .body(new MessageResponse("Email is required"));
-            }
-    
-            // 2. إنشاء مستخدم مؤقت (بدون حفظه في قاعدة البيانات)
-            User user = new User();
-            user.setEmail(email);
-            user.setUserName(name != null ? name : "User"); // اسم افتراضي إذا لم يوفر
-            user.setRole(Role.USER); // افتراضي
-            user.setProfilePicture(picture); // إذا كانت الصورة متوفرة
-    
-            // 3. إنشاء مصادقة JWT يدوية
-            UserDetailsImpl userDetails = UserDetailsImpl.build(user);
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, 
-                null, 
-                userDetails.getAuthorities()
-            );
-            
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtUtils.generateJwtToken(authentication);
-    
-            // 4. إرجاع معلومات المستخدم مع الـ JWT كـ Map
-            Map<String, Object> userInfo = new HashMap<>();
-            userInfo.put("userId", null); // لا يوجد معرف مستخدم لأنه لم يتم حفظه
-            userInfo.put("userName", user.getUserName());
-            userInfo.put("email", user.getEmail());
-            userInfo.put("profilePicture", user.getProfilePicture());
-            userInfo.put("role", user.getRole().name());
-    
-            Map<String, Object> response = new HashMap<>();
-            response.put("token", jwt);
-            response.put("userInfo", userInfo);
-    
-            return ResponseEntity.ok(response);
-    
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new MessageResponse("Google authentication failed: " + e.getMessage()));
+//     @PostMapping("/google")
+// public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String> request) {
+//     try {
+//         String email = request.get("email");
+
+//         // التحقق من وجود البريد الإلكتروني في الطلب
+//         if (email == null || email.isEmpty()) {
+//             return ResponseEntity.badRequest()
+//                 .body(new MessageResponse("Email is required"));
+//         }
+
+//         // البحث عن المستخدم بواسطة البريد الإلكتروني
+//         User user = userService.findByEmail(email).get();
+
+//         // إذا لم يتم العثور على المستخدم
+//         if (user == null) {
+//             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                 .body(new MessageResponse("User not found with email: " + email));
+//         }
+
+//         // إرجاع معلومات المستخدم
+//         return ResponseEntity.ok(user);
+
+//     } catch (Exception e) {
+//         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//             .body(new MessageResponse("Error retrieving user: " + e.getMessage()));
+//     }
+// }
+@PostMapping("/google")
+public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String> request) {
+    try {
+        String email = request.get("email");
+
+        if (email == null || email.isEmpty()) {
+            return ResponseEntity.badRequest()
+                .body(new MessageResponse("Email is required"));
         }
+
+        Optional<User> userOptional = userService.findByEmail(email);
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new MessageResponse("User not found with email: " + email));
+        }
+
+        User user = userOptional.get();
+        return ResponseEntity.ok(user);
+
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(new MessageResponse("Error retrieving user: " + e.getMessage()));
     }
+}
     @PutMapping("/changePassword")
     public ResponseEntity<?> changePassword(@RequestBody Map<String, String> passwords,
                                           HttpServletRequest request) {

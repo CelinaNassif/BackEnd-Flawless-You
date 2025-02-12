@@ -75,7 +75,7 @@ public class WebSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
             "http://localhost:3000",
-            "http://localhost:57191",  // Add Flutter web dev server port
+            "http://localhost:57191",  
             "https://accounts.google.com",
             "https://www.googleapis.com"
         ));
