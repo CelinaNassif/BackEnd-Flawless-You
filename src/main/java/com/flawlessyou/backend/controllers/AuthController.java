@@ -189,7 +189,7 @@ public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String>
 
         Optional<User> userOptional = userService.findByEmail(email);
 
-        if (userOptional.isEmpty()) {
+        if (userOptional.isEmpty()) { 
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new MessageResponse("User not found with email: " + email));
         }
