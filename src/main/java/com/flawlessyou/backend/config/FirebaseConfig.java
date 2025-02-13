@@ -38,4 +38,5 @@ public class FirebaseConfig {
         // 5. إرجاع Firestore bean
         return FirestoreClient.getFirestore();
     }
+    
 }
