@@ -209,7 +209,7 @@ public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String>
             jwt,
             user.getUserId(),
             user.getUserName(),
-            user.getEmail(),
+            user.getEmail(),  
             Collections.singletonList(user.getRole().name())
         ));
 
