@@ -2,7 +2,7 @@ package com.flawlessyou.backend.Security.Services;
 
 import java.util.Collection;
 import java.util.Collections;
-
+import java.util.List;
 import java.util.Objects;
 
 
@@ -35,6 +35,11 @@ public class UserDetailsImpl implements UserDetails {
     this.password = password;
     this.authorities=authorities;
    
+  }
+
+  public UserDetailsImpl(String userId, String userName2, String email2, String hashedPassword,
+      List<Role> singletonList) {
+    //TODO Auto-generated constructor stub
   }
 
   public static UserDetailsImpl build(User user) {

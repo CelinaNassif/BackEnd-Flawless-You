@@ -177,6 +177,7 @@ public class AuthController {
 //             .body(new MessageResponse("Error retrieving user: " + e.getMessage()));
 //     }
 // }
+
 @PostMapping("/google")
 public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String> request) {
     try {
@@ -195,7 +196,22 @@ public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String>
         }
 
         User user = userOptional.get();
-        return ResponseEntity.ok(user);
+        
+        UserDetailsImpl userDetails = UserDetailsImpl.build(user);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            userDetails, null, userDetails.getAuthorities());
+        
+        String jwt = jwtUtils.generateJwtToken(authentication);
+        
+        System.out.println("Generated JWT token for Google login: " + jwt);
+
+        return ResponseEntity.ok(new JwtResponse(
+            jwt,
+            user.getUserId(),
+            user.getUserName(),
+            user.getEmail(),
+            Collections.singletonList(user.getRole().name())
+        ));
 
     } catch (Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

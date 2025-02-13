@@ -44,7 +44,7 @@ public class UserController {
             userResponse.put("role", user.getRole());
             userResponse.put("profilePicture", user.getProfilePicture());
             
-            return ResponseEntity.ok(userResponse);
+            return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new MessageResponse("Error fetching user details: " + e.getMessage()));
