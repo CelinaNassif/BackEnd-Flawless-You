@@ -2,9 +2,12 @@ package com.flawlessyou.backend.entity.user;
 // import com.flawlessyou.backend.entity.user.Role;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import org.springframework.security.core.GrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -25,7 +28,7 @@ public class User {
     private List<String> skinAnalysisHistoryIds;// نتأكد منهم اذا سترنج ولا skinAnalisis
     private Set<String> savedProductIds;// نتأكد
     private List<String> reviewIds;// نتأكد
-
+  private Collection<? extends GrantedAuthority> authorities; 
     public User( String userName, String email,  String hashedPassword) {
        
         this.userId = UUID.randomUUID().toString();
@@ -48,7 +51,13 @@ public class User {
         this.profilePicture = profilePicture;
         this.dateOfBirth = dateOfBirth;
     }
-  
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
+        this.authorities = authorities;
+    }
     public String getUserId() {
         return userId;
     }

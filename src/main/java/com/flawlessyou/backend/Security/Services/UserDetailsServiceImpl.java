@@ -13,8 +13,7 @@ import java.util.concurrent.ExecutionException;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    private UserService userService; // استبدال الـ Repository بالـ Service
-
+    private UserService userService; 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {

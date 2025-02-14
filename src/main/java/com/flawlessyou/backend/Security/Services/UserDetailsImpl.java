@@ -4,13 +4,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.flawlessyou.backend.config.GetUser;
 import com.flawlessyou.backend.entity.user.Role;
 import com.flawlessyou.backend.entity.user.User;
 
@@ -22,6 +24,7 @@ public class UserDetailsImpl implements UserDetails {
   private String username;
 
   private String email;
+ private static final Logger logger = LoggerFactory.getLogger(GetUser.class);
 
   @JsonIgnore
   private String password;
@@ -38,29 +41,27 @@ public class UserDetailsImpl implements UserDetails {
   }
 
   public UserDetailsImpl(String userId, String userName2, String email2, String hashedPassword,
-      List<Role> singletonList) {
+   Role singletonList) {
     //TODO Auto-generated constructor stub
   }
 
-  public static UserDetailsImpl build(User user) {
-    // List<GrantedAuthority> authorities = user.role.stream()
-    //     .map(role -> new SimpleGrantedAuthority(role.name()))
-    //     .collect(Collectors.toList());
+ public static UserDetailsImpl build(User user) {
     if (user.getRole() == null) {
-      user.setRole(Role.USER);
-  }
-    GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
+        user.setRole(Role.USER);
+    }
+    GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
+
+    // طباعة الدور للتحقق منه
+    logger.info("User role: " + user.getRole().name());
 
     return new UserDetailsImpl(
         user.getUserId(),
         user.getUserName(),
         user.getEmail(),
         user.getHashedPassword(),
-        Collections.singletonList(authority) // تحويلها إلى قائمة تحتوي على عنصر واحد
+        Collections.singletonList(authority)
     );
-       
-  } 
-
+}
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return authorities;
