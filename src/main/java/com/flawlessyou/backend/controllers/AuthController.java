@@ -10,6 +10,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.flawlessyou.backend.Security.Jwt.JwtUtils;
 import com.flawlessyou.backend.Security.Services.UserDetailsImpl;
+import com.flawlessyou.backend.config.GetUser;
 import com.flawlessyou.backend.Payload.Request.LoginRequest;
 import com.flawlessyou.backend.Payload.Request.SignupRequest;
 import com.flawlessyou.backend.Payload.Response.JwtResponse;
@@ -52,8 +53,7 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
-
-
+   public GetUser getUser;
 
     // @GetMapping("/swagger-ui")
     // public ResponseEntity<Object> redirectToSwagger() {
@@ -230,7 +230,7 @@ public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String>
                     .body(new MessageResponse("Both old and new passwords are required"));
             }
 
-            String jwt = parseJwt(request);
+            String jwt = getUser.parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
                 User user = userService.findByUsername(username)
@@ -255,11 +255,4 @@ public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String>
         }
     }
 
-    private String parseJwt(HttpServletRequest request) {
-        String headerAuth = request.getHeader("Authorization");
-        if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
-            return headerAuth.substring(7);
-        }
-        return null;
-    }
 }
