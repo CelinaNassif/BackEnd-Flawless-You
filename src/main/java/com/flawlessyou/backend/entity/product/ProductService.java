@@ -24,31 +24,38 @@ public class ProductService {
         return query.get().get().toObjects(Product.class);
     }
 
-
-//     public String addProduct(Product product) throws ExecutionException, InterruptedException {
+    public Product addProduct(Product product) throws ExecutionException, InterruptedException {
+        DocumentReference docRef;
         
-//     ApiFuture<DocumentReference> future = firestore.collection(COLLECTION_NAME).add(product);
-//     DocumentReference docRef = future.get();
-//     return docRef.getId();
-// }
-//     public void addProductToUserSaved(String userId, String productId) throws ExecutionException, InterruptedException {
-//         DocumentReference userRef = firestore.collection("users").document(userId);
-//         userRef.update("savedProductIds", FieldValue.arrayUnion(productId)).get();
-//     }
+        if (product.getProductId() == null || product.getProductId().isEmpty()) {
+            docRef = firestore.collection(COLLECTION_NAME).document(); 
+            product.setProductId(docRef.getId());
+        } else {
+            docRef = firestore.collection(COLLECTION_NAME).document(product.getProductId());
+        }
+        
+        docRef.set(product).get();
+        return product;
+    }
 
-public String addProduct(Product product) throws ExecutionException, InterruptedException {
-    DocumentReference docRef;
+    public Product getProductById(String productId) throws ExecutionException, InterruptedException {
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(productId);
+        DocumentSnapshot snapshot = docRef.get().get();
+        return snapshot.exists() ? snapshot.toObject(Product.class) : null;
+    }
+
+    public Product addProductPhotos(String productId, List<String> photoUrls) 
+    throws ExecutionException, InterruptedException {
     
-    if (product.getProductId() == null || product.getProductId().isEmpty()) {
-        docRef = firestore.collection(COLLECTION_NAME).document(); 
-        product.setProductId(docRef.getId());
-    } else {
-        docRef = firestore.collection(COLLECTION_NAME).document(product.getProductId());
+    DocumentReference productRef = firestore.collection(COLLECTION_NAME).document(productId);
+    
+    if (!productRef.get().get().exists()) {
+        throw new IllegalArgumentException("Product not found!");
     }
     
-    docRef.set(product).get();
+    productRef.update("photos", FieldValue.arrayUnion(photoUrls.toArray(new String[0]))).get();
     
-    return docRef.getId();
+    return productRef.get().get().toObject(Product.class);
 }
 
 

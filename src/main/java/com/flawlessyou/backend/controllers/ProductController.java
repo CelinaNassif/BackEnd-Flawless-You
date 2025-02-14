@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.flawlessyou.backend.config.GetUser;
 import com.flawlessyou.backend.entity.cloudinary.CloudinaryResponse;
@@ -101,47 +103,68 @@ public ResponseEntity<?> getRandomProducts(
 }
 
 
-@PreAuthorize("hasRole('ADMIN')")
-@PostMapping(value = "/product", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-public ResponseEntity<?> addProduct(
-       @RequestPart(value = "product", required = true) @Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Product product,
-        @RequestParam(value = "files", required = false) List<MultipartFile> files,
-        HttpServletRequest request) { 
-    if (product == null) {
-        return ResponseEntity.badRequest().body("Product data is required");
+@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createProduct(
+            @RequestBody Product product,
+            HttpServletRequest request) {
+        
+        try {
+            User admin = getUser.userFromToken(request);
+            if (admin == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
+            
+            product.setAdminId(admin.getUserId());
+            product.setPhotos(new ArrayList<>()); 
+            
+            Product createdProduct = productService.addProduct(product);
+            return ResponseEntity.ok(createdProduct);
+            
+        } catch (Exception e) {
+            logger.error("Error creating product", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error: " + e.getMessage());
+        }
     }
 
-    try {
-        User admin = getUser.userFromToken(request);
-        if (admin == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
-        }
 
-        product.setAdminId(admin.getUserId());
+     @PostMapping(value = "/{productId}/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> addPhotosToProduct(
+            @PathVariable String productId,
+            @RequestParam("files") List<MultipartFile> files,
+            HttpServletRequest request) {
+        
+        try {
+            User admin = getUser.userFromToken(request);
+            if (admin == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
 
-        List<String> photoUrls = new ArrayList<>();
+            Product existingProduct = productService.getProductById(productId);
+            if (existingProduct == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+            }
 
-        if (files != null && !files.isEmpty()) {
+            if (!existingProduct.getAdminId().equals(admin.getUserId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access");
+            }
+
+            List<String> photoUrls = new ArrayList<>();
+            
             for (MultipartFile file : files) {
                 FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
-                String fileName = StringUtils.cleanPath(
-                    product.getProductId() + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename()
-                );
+                String fileName = productId + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
                 CloudinaryResponse response = cloudinaryService.uploadFile(file, fileName);
-                if (response != null && response.getUrl() != null) {
-                    photoUrls.add(response.getUrl());
-                }
+                photoUrls.add(response.getUrl());
             }
+            
+            Product updatedProduct = productService.addProductPhotos(productId, photoUrls);
+            return ResponseEntity.ok(updatedProduct);
+            
+        } catch (Exception e) {
+            logger.error("Error adding photos", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error: " + e.getMessage());
         }
-
-        product.setPhotos(photoUrls);
-        String productId = productService.addProduct(product);
-        return ResponseEntity.ok(Collections.singletonMap("productId", productId));
-
-    } catch (Exception e) {
-        logger.error("Error adding product", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-               .body("Error: " + e.getMessage());
     }
-}
 }

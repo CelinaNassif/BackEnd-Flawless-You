@@ -6,7 +6,7 @@ import lombok.Builder;
 import java.util.List;
 
 import jakarta.persistence.GeneratedValue;
-@Data
+// @Data
 @NoArgsConstructor
 public class Product {
     // @GeneratedValue
@@ -26,6 +26,54 @@ public class Product {
         this.ingredients = ingredients;
       
         
+    }
+    public String getProductId() {
+        return productId;
+    }
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public List<Type> getSkinType() {
+        return skinType;
+    }
+    public void setSkinType(List<Type> skinType) {
+        this.skinType = skinType;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public List<String> getIngredients() {
+        return ingredients;
+    }
+    public void setIngredients(List<String> ingredients) {
+        this.ingredients = ingredients;
+    }
+    public String getAdminId() {
+        return adminId;
+    }
+    public void setAdminId(String adminId) {
+        this.adminId = adminId;
+    }
+    public List<String> getPhotos() {
+        return photos;
+    }
+    public void setPhotos(List<String> photos) {
+        this.photos = photos;
+    }
+    public List<String> getReviewIds() {
+        return reviewIds;
+    }
+    public void setReviewIds(List<String> reviewIds) {
+        this.reviewIds = reviewIds;
     }
 
    
