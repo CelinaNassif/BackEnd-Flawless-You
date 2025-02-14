@@ -4,6 +4,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.persistence.GeneratedValue;
 // @Data
@@ -17,7 +18,7 @@ public class Product {
     private List<String> ingredients;
     private String adminId;// هاد اليوزر الي ضاف البرودكت 
     private List<String> photos;
-    private List<String> reviewIds;
+    private Map<String, Integer> reviews;
     public Product(String name, List<Type> skinType, String description, List<String> ingredients
 ) {
         this.name = name;
@@ -69,11 +70,11 @@ public class Product {
     public void setPhotos(List<String> photos) {
         this.photos = photos;
     }
-    public List<String> getReviewIds() {
-        return reviewIds;
+    public Map<String, Integer>  getReviews() {
+        return reviews;
     }
-    public void setReviewIds(List<String> reviewIds) {
-        this.reviewIds = reviewIds;
+    public void setReviews(Map<String, Integer>  reviews) {
+        this.reviews = reviews;
     }
 
    
