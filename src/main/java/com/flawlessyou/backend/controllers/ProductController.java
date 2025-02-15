@@ -268,7 +268,7 @@ public ResponseEntity<?> getRandomProducts(
 
 
 
-    @GetMapping("/isSaved")
+    @GetMapping("/Saved")
     public ResponseEntity<?> getSavedProduct(
            
             HttpServletRequest request) {
@@ -284,11 +284,37 @@ public ResponseEntity<?> getRandomProducts(
             return ResponseEntity.ok(Saved);
 
         } catch (Exception e) {
-            logger.error("Error checking if product is saved", e);
+            logger.error("Error in getting product", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                    .body("Error: " + e.getMessage());
         }
     }
+
+
+
+
+
+
+
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<?> deleteProduct(  @PathVariable String productId) {
+        
+        try {
+
+            productService.deleteProduct(productId);
+
+            return ResponseEntity.ok("deleted successfully");
+
+        } catch (Exception e) {
+            logger.error("Error checking if product is deleted", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error: " + e.getMessage());
+        }
+    }
+
+
+
 
 
 
