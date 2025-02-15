@@ -266,5 +266,33 @@ public ResponseEntity<?> getRandomProducts(
 
 
 
+
+
+    @GetMapping("/isSaved")
+    public ResponseEntity<?> getSavedProduct(
+           
+            HttpServletRequest request) {
+        
+        try {
+            User user = getUser.userFromToken(request);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
+
+            List<Product> Saved = productService.getSavedProducts(user.getUserId());
+
+            return ResponseEntity.ok(Saved);
+
+        } catch (Exception e) {
+            logger.error("Error checking if product is saved", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error: " + e.getMessage());
+        }
+    }
+
+
+
+
+
     
 }
