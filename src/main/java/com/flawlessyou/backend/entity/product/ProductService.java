@@ -154,24 +154,24 @@ public Product deleteReview(String productId, String userId) throws ExecutionExc
 
 
 public void toggleProductForUser(String userId, String productId) 
-throws ExecutionException, InterruptedException {
+    throws ExecutionException, InterruptedException {
 
-DocumentReference userRef = firestore.collection(USERS_COLLECTION).document(userId);
+    DocumentReference userRef = firestore.collection(USERS_COLLECTION).document(userId);
+    DocumentSnapshot userSnapshot = userRef.get().get();
+    List<String> savedProductIds = (List<String>) userSnapshot.get("savedProductIds");
 
-DocumentSnapshot userSnapshot = userRef.get().get();
-List<String> savedProductIds = (List<String>) userSnapshot.get("savedProductIds");
+    if (savedProductIds == null) {
+        savedProductIds = new ArrayList<>();
+    }
 
-if (savedProductIds == null) {
-    savedProductIds = new ArrayList<>();
+    if (savedProductIds.contains(productId)) {
+        savedProductIds.remove(productId); 
+    } else {
+        savedProductIds.add(productId); 
+    }
+
+    userRef.update("savedProductIds", savedProductIds).get();
 }
-
-if (savedProductIds.contains(productId)) {
-    userRef.update("savedProductIds", FieldValue.arrayRemove(productId)).get();
-} else {
-    userRef.update("savedProductIds", FieldValue.arrayUnion(productId)).get();
-}
-}
-
 
 
 public boolean isProductSavedByUser(String userId, String productId) 
@@ -188,6 +188,71 @@ if (savedProductIds == null || savedProductIds.isEmpty()) {
 
 return savedProductIds.contains(productId);
 }
+
+
+
+
+
+
+public List<Product> getSavedProducts(String userId) throws ExecutionException, InterruptedException {
+    DocumentReference userRef = firestore.collection(USERS_COLLECTION).document(userId);
+    DocumentSnapshot userSnapshot = userRef.get().get();
+    
+    List<String> savedProductIds = (List<String>) userSnapshot.get("savedProductIds");
+    
+    if (savedProductIds == null || savedProductIds.isEmpty()) {
+        return Collections.emptyList(); 
+    }
+    
+    List<Product> savedProducts = new ArrayList<>();
+    
+    for (String productId : savedProductIds) {
+        DocumentReference productRef = firestore.collection(COLLECTION_NAME).document(productId);
+        DocumentSnapshot productSnapshot = productRef.get().get();
+        
+        if (productSnapshot.exists()) {
+            savedProducts.add(productSnapshot.toObject(Product.class));
+        }
+    }
+    
+    return savedProducts;
+}
+
+
+
+
+
+
+
+
+
+public void deleteProduct(String productId) throws ExecutionException, InterruptedException {
+    DocumentReference productRef = firestore.collection(COLLECTION_NAME).document(productId);
+    DocumentSnapshot productSnapshot = productRef.get().get();
+    
+    if (productSnapshot.exists()) {
+        productRef.delete().get();
+        System.out.println("Product with ID " + productId + " has been deleted.");
+    } else {
+        System.out.println("Product with ID " + productId + " does not exist.");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
