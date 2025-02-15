@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -312,6 +313,31 @@ public ResponseEntity<?> getRandomProducts(
                    .body("Error: " + e.getMessage());
         }
     }
+
+
+
+
+
+
+
+
+    @PutMapping("/product")
+    public ResponseEntity<?> editProduct(  @RequestBody Product product) {
+        
+        try {
+
+           Product product2 = productService.updateProduct(product);
+
+            return ResponseEntity.ok(product2);
+
+        } catch (Exception e) {
+            logger.error("Error checking if product is deleted", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error: " + e.getMessage());
+        }
+    }
+
+
 
 
 
