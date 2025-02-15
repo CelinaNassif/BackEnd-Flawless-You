@@ -2,7 +2,9 @@ package com.flawlessyou.backend.controllers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.flawlessyou.backend.config.GetUser;
 import com.flawlessyou.backend.entity.cloudinary.CloudinaryResponse;
@@ -52,42 +57,6 @@ public class ProductController {
 
     
 
-//     @PreAuthorize("hasRole('ADMIN')")
-// @PostMapping(value = "/product", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-// public ResponseEntity<?> addProduct(
-//         @RequestPart("product") Product product,
-//         @RequestParam("files") List<MultipartFile> files) throws ExecutionException, InterruptedException {
-    
-//     if (product == null) {
-//         return ResponseEntity.badRequest().body("Product data is required");
-//     }
-//     System.out.println("Received product: " + product.toString());
-//     List<String> photoUrls = new ArrayList<>();
-    
-//     try {
-//         for (MultipartFile file : files) {
-//             System.out.println("Received file: " + file.getOriginalFilename());
-
-//             FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
-            
-//             String fileName = StringUtils.cleanPath(
-//                 product.getProductId() + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename()
-//             );
-            
-//             CloudinaryResponse response = cloudinaryService.uploadFile(file, fileName);
-//             photoUrls.add(response.getUrl());
-//         }
-        
-//         product.setPhotos(photoUrls);
-//         String productId = productService.addProduct(product);
-//         return ResponseEntity.ok(product+" "+productId);
-        
-//     } catch (Exception e) {
-//         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                .body("File upload failed: " + e.getMessage());
-//     }
-// }
-
 @GetMapping("/random")
 public ResponseEntity<?> getRandomProducts(
         @RequestParam(defaultValue = "6") int limit) { 
@@ -101,47 +70,198 @@ public ResponseEntity<?> getRandomProducts(
 }
 
 
-@PreAuthorize("hasRole('ADMIN')")
-@PostMapping(value = "/product", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-public ResponseEntity<?> addProduct(
-       @RequestPart(value = "product", required = true) @Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Product product,
-        @RequestParam(value = "files", required = false) List<MultipartFile> files,
-        HttpServletRequest request) { 
-    if (product == null) {
-        return ResponseEntity.badRequest().body("Product data is required");
+@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createProduct(
+            @RequestBody Product product,
+            HttpServletRequest request) {
+        
+        try {
+            User admin = getUser.userFromToken(request);
+            if (admin == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
+            
+            product.setAdminId(admin.getUserId());
+            product.setPhotos(new ArrayList<>()); 
+              product.setReviews(new HashMap<>());
+            Product createdProduct = productService.addProduct(product);
+            return ResponseEntity.ok(createdProduct);
+            
+        } catch (Exception e) {
+            logger.error("Error creating product", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error: " + e.getMessage());
+        }
     }
 
-    try {
-        User admin = getUser.userFromToken(request);
-        if (admin == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
-        }
 
-        product.setAdminId(admin.getUserId());
+     @PostMapping(value = "/{productId}/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> addPhotosToProduct(
+            @PathVariable String productId,
+            @RequestParam("files") List<MultipartFile> files,
+            HttpServletRequest request) {
+        
+        try {
+            User admin = getUser.userFromToken(request);
+            if (admin == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
 
-        List<String> photoUrls = new ArrayList<>();
+            Product existingProduct = productService.getProductById(productId);
+            if (existingProduct == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+            }
 
-        if (files != null && !files.isEmpty()) {
+            if (!existingProduct.getAdminId().equals(admin.getUserId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access");
+            }
+
+            List<String> photoUrls = new ArrayList<>();
+            
             for (MultipartFile file : files) {
                 FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
-                String fileName = StringUtils.cleanPath(
-                    product.getProductId() + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename()
-                );
+                String fileName = productId + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
                 CloudinaryResponse response = cloudinaryService.uploadFile(file, fileName);
-                if (response != null && response.getUrl() != null) {
-                    photoUrls.add(response.getUrl());
-                }
+                photoUrls.add(response.getUrl());
             }
+            
+            Product updatedProduct = productService.addProductPhotos(productId, photoUrls);
+            return ResponseEntity.ok(updatedProduct);
+            
+        } catch (Exception e) {
+            logger.error("Error adding photos", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error: " + e.getMessage());
         }
+    }
+    @PostMapping(value = "/{productId}/review")
+    public ResponseEntity<?> addReview(
+        @PathVariable String productId,
+        @RequestBody int review,
+        HttpServletRequest request) {
+            try {
+       Product product= productService.getProductById(productId);
 
-        product.setPhotos(photoUrls);
-        String productId = productService.addProduct(product);
-        return ResponseEntity.ok(Collections.singletonMap("productId", productId));
+       User admin = getUser.userFromToken(request);
+       if (admin == null) {
+           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+       }
+       if (product.getReviews() == null) {
+        product.setReviews(new HashMap<>());
+    }
+      product.getReviews().put(admin.getUserId(),Integer.valueOf(review));
+      productService.updateProduct(product);
+       Map<String,Integer> reviews=product.getReviews();
+       
+            return ResponseEntity.ok(reviews);
 
     } catch (Exception e) {
-        logger.error("Error adding product", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-               .body("Error: " + e.getMessage());
+            logger.error("Error adding photos", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error: " + e.getMessage());
+        }}
+    
+
+
+
+        @GetMapping(value = "/{productId}/review")
+        public ResponseEntity<?> getReviews(
+            @PathVariable String productId,
+            HttpServletRequest request) {
+                try {
+           Product product= productService.getProductById(productId);
+           Map<String, Integer>  reviews= product.getReviews();
+           if (reviews == null || reviews.isEmpty()) {
+            return ResponseEntity.ok(0);
+        }
+        int sum = 0;
+        for (int rating : reviews.values()) {
+            sum += rating;
+        }
+        
+        return ResponseEntity.ok( (double) sum / reviews.size());
+       
+    
+        } catch (Exception e) {
+                logger.error("Error adding photos", e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                       .body("Error: " + e.getMessage());
+            }}
+        
+
+
+            @DeleteMapping(value = "/{productId}/review")
+            public ResponseEntity<?> deleteReview(
+                @PathVariable String productId,
+                HttpServletRequest request) {
+                    try {
+                        // الحصول على المستخدم من التوكن
+                        User user = getUser.userFromToken(request);
+                        if (user == null) {
+                            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+                        }
+            
+                        // حذف الـ review
+                        Product updatedProduct = productService.deleteReview(productId, user.getUserId());
+            
+                        return ResponseEntity.ok(updatedProduct);
+            
+                    } catch (Exception e) {
+                        logger.error("Error deleting review", e);
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                               .body("Error: " + e.getMessage());
+                    }
+            }
+                    
+            
+
+
+
+
+            @PostMapping("/{productId}/savedProduct")
+            public ResponseEntity<?> SavedProduct(
+                    @PathVariable String productId,
+                    HttpServletRequest request) {
+                
+                try {
+                 
+                    User user = getUser.userFromToken(request);
+                    if (user == null) {
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+                    }
+        
+                    productService.toggleProductForUser(user.getUserId(), productId);
+        
+                    return ResponseEntity.ok("Product save status toggled successfully");
+        
+                } catch (Exception e) {
+                    logger.error("Error toggling product save status", e);
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                           .body("Error: " + e.getMessage());
+                }
+            }
+
+
+
+            @GetMapping("/{productId}/isSaved")
+    public ResponseEntity<?> isProductSaved(
+            @PathVariable String productId,
+            HttpServletRequest request) {
+        
+        try {
+            User user = getUser.userFromToken(request);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
+
+            boolean isSaved = productService.isProductSavedByUser(user.getUserId(), productId);
+
+            return ResponseEntity.ok(isSaved);
+
+        } catch (Exception e) {
+            logger.error("Error checking if product is saved", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error: " + e.getMessage());
+        }
     }
-}
 }

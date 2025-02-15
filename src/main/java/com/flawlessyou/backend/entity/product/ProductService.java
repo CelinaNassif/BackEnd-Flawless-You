@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.Collections;
+import java.util.HashMap;
 @Service
 public class ProductService {
     
@@ -16,6 +18,7 @@ public class ProductService {
     private Firestore firestore;
     
     private static final String COLLECTION_NAME = "products";
+    private static final String USERS_COLLECTION = "users";
 
     public List<Product> getProductsBySkinType(String skinType) throws ExecutionException, InterruptedException {
         Query query = firestore.collection(COLLECTION_NAME)
@@ -24,31 +27,38 @@ public class ProductService {
         return query.get().get().toObjects(Product.class);
     }
 
-
-//     public String addProduct(Product product) throws ExecutionException, InterruptedException {
+    public Product addProduct(Product product) throws ExecutionException, InterruptedException {
+        DocumentReference docRef;
         
-//     ApiFuture<DocumentReference> future = firestore.collection(COLLECTION_NAME).add(product);
-//     DocumentReference docRef = future.get();
-//     return docRef.getId();
-// }
-//     public void addProductToUserSaved(String userId, String productId) throws ExecutionException, InterruptedException {
-//         DocumentReference userRef = firestore.collection("users").document(userId);
-//         userRef.update("savedProductIds", FieldValue.arrayUnion(productId)).get();
-//     }
+        if (product.getProductId() == null || product.getProductId().isEmpty()) {
+            docRef = firestore.collection(COLLECTION_NAME).document(); 
+            product.setProductId(docRef.getId());
+        } else {
+            docRef = firestore.collection(COLLECTION_NAME).document(product.getProductId());
+        }
+        
+        docRef.set(product).get();
+        return product;
+    }
 
-public String addProduct(Product product) throws ExecutionException, InterruptedException {
-    DocumentReference docRef;
+    public Product getProductById(String productId) throws ExecutionException, InterruptedException {
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(productId);
+        DocumentSnapshot snapshot = docRef.get().get();
+        return snapshot.exists() ? snapshot.toObject(Product.class) : null;
+    }
+
+    public Product addProductPhotos(String productId, List<String> photoUrls) 
+    throws ExecutionException, InterruptedException {
     
-    if (product.getProductId() == null || product.getProductId().isEmpty()) {
-        docRef = firestore.collection(COLLECTION_NAME).document(); 
-        product.setProductId(docRef.getId());
-    } else {
-        docRef = firestore.collection(COLLECTION_NAME).document(product.getProductId());
+    DocumentReference productRef = firestore.collection(COLLECTION_NAME).document(productId);
+    
+    if (!productRef.get().get().exists()) {
+        throw new IllegalArgumentException("Product not found!");
     }
     
-    docRef.set(product).get();
+    productRef.update("photos", FieldValue.arrayUnion(photoUrls.toArray(new String[0]))).get();
     
-    return docRef.getId();
+    return productRef.get().get().toObject(Product.class);
 }
 
 
@@ -66,4 +76,121 @@ public List<Product> getRandomProducts(int limit) throws ExecutionException, Int
 
     return randomProducts;
 }
+
+public Product updateProduct(Product product) throws ExecutionException, InterruptedException {
+    if (product.getProductId() == null || product.getProductId().isEmpty()) {
+        throw new IllegalArgumentException("Product ID cannot be null or empty");
+    }
+
+    DocumentReference productRef = firestore.collection(COLLECTION_NAME).document(product.getProductId());
+
+    if (!productRef.get().get().exists()) {
+        throw new IllegalArgumentException("Product not found!");
+    }
+
+    Map<String, Object> updates = new HashMap<>();
+
+   
+    if (product.getName() != null) {
+        updates.put("name", product.getName());
+    }
+    if (product.getSkinType() != null) {
+        updates.put("skinType", product.getSkinType());
+    }
+    if (product.getDescription() != null) {
+        updates.put("description", product.getDescription());
+    }
+    if (product.getIngredients() != null) {
+        updates.put("ingredients", product.getIngredients());
+    }
+    if (product.getAdminId() != null) {
+        updates.put("adminId", product.getAdminId());
+    }
+    if (product.getPhotos() != null) {
+        updates.put("photos", product.getPhotos());
+    }
+    if (product.getReviews() != null) {
+        updates.put("reviews", product.getReviews());
+    }
+
+    if (!updates.isEmpty()) {
+        productRef.update(updates).get();
+    }
+
+    return productRef.get().get().toObject(Product.class);
+}
+
+
+
+
+
+public Product deleteReview(String productId, String userId) throws ExecutionException, InterruptedException {
+    if (productId == null || productId.isEmpty()) {
+        throw new IllegalArgumentException("Product ID cannot be null or empty");
+    }
+    DocumentReference productRef = firestore.collection(COLLECTION_NAME).document(productId);
+
+    DocumentSnapshot snapshot = productRef.get().get();
+    if (!snapshot.exists()) {
+        throw new IllegalArgumentException("Product not found!");
+    }
+
+    Map<String, Integer> reviews = (Map<String, Integer>) snapshot.get("reviews");
+
+    if (reviews == null || reviews.isEmpty()) {
+        throw new IllegalArgumentException("No reviews found for this product");
+    }
+
+    if (!reviews.containsKey(userId)) {
+        throw new IllegalArgumentException("User has not reviewed this product");
+    }
+
+    reviews.remove(userId);
+
+    productRef.update("reviews", reviews).get();
+
+    return productRef.get().get().toObject(Product.class);
+}
+
+
+public void toggleProductForUser(String userId, String productId) 
+throws ExecutionException, InterruptedException {
+
+DocumentReference userRef = firestore.collection(USERS_COLLECTION).document(userId);
+
+DocumentSnapshot userSnapshot = userRef.get().get();
+List<String> savedProductIds = (List<String>) userSnapshot.get("savedProductIds");
+
+if (savedProductIds == null) {
+    savedProductIds = new ArrayList<>();
+}
+
+if (savedProductIds.contains(productId)) {
+    userRef.update("savedProductIds", FieldValue.arrayRemove(productId)).get();
+} else {
+    userRef.update("savedProductIds", FieldValue.arrayUnion(productId)).get();
+}
+}
+
+
+
+public boolean isProductSavedByUser(String userId, String productId) 
+throws ExecutionException, InterruptedException {
+
+DocumentReference userRef = firestore.collection(USERS_COLLECTION).document(userId);
+
+DocumentSnapshot userSnapshot = userRef.get().get();
+List<String> savedProductIds = (List<String>) userSnapshot.get("savedProductIds");
+
+if (savedProductIds == null || savedProductIds.isEmpty()) {
+    return false; 
+}
+
+return savedProductIds.contains(productId);
+}
+
+
+
+
+
 }

@@ -29,6 +29,7 @@ public class User {
     private Set<String> savedProductIds;// نتأكد
     private List<String> reviewIds;// نتأكد
   private Collection<? extends GrantedAuthority> authorities; 
+  
     public User( String userName, String email,  String hashedPassword) {
        
         this.userId = UUID.randomUUID().toString();
