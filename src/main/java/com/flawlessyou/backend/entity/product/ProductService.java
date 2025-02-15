@@ -18,6 +18,7 @@ public class ProductService {
     private Firestore firestore;
     
     private static final String COLLECTION_NAME = "products";
+    private static final String USERS_COLLECTION = "users";
 
     public List<Product> getProductsBySkinType(String skinType) throws ExecutionException, InterruptedException {
         Query query = firestore.collection(COLLECTION_NAME)
@@ -150,4 +151,46 @@ public Product deleteReview(String productId, String userId) throws ExecutionExc
 
     return productRef.get().get().toObject(Product.class);
 }
+
+
+public void toggleProductForUser(String userId, String productId) 
+throws ExecutionException, InterruptedException {
+
+DocumentReference userRef = firestore.collection(USERS_COLLECTION).document(userId);
+
+DocumentSnapshot userSnapshot = userRef.get().get();
+List<String> savedProductIds = (List<String>) userSnapshot.get("savedProductIds");
+
+if (savedProductIds == null) {
+    savedProductIds = new ArrayList<>();
+}
+
+if (savedProductIds.contains(productId)) {
+    userRef.update("savedProductIds", FieldValue.arrayRemove(productId)).get();
+} else {
+    userRef.update("savedProductIds", FieldValue.arrayUnion(productId)).get();
+}
+}
+
+
+
+public boolean isProductSavedByUser(String userId, String productId) 
+throws ExecutionException, InterruptedException {
+
+DocumentReference userRef = firestore.collection(USERS_COLLECTION).document(userId);
+
+DocumentSnapshot userSnapshot = userRef.get().get();
+List<String> savedProductIds = (List<String>) userSnapshot.get("savedProductIds");
+
+if (savedProductIds == null || savedProductIds.isEmpty()) {
+    return false; 
+}
+
+return savedProductIds.contains(productId);
+}
+
+
+
+
+
 }

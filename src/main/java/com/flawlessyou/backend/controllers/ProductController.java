@@ -212,5 +212,56 @@ public ResponseEntity<?> getRandomProducts(
                                .body("Error: " + e.getMessage());
                     }
             }
-                     
+                    
+            
+
+
+
+
+            @PostMapping("/{productId}/savedProduct")
+            public ResponseEntity<?> SavedProduct(
+                    @PathVariable String productId,
+                    HttpServletRequest request) {
+                
+                try {
+                 
+                    User user = getUser.userFromToken(request);
+                    if (user == null) {
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+                    }
+        
+                    productService.toggleProductForUser(user.getUserId(), productId);
+        
+                    return ResponseEntity.ok("Product save status toggled successfully");
+        
+                } catch (Exception e) {
+                    logger.error("Error toggling product save status", e);
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                           .body("Error: " + e.getMessage());
+                }
+            }
+
+
+
+            @GetMapping("/{productId}/isSaved")
+    public ResponseEntity<?> isProductSaved(
+            @PathVariable String productId,
+            HttpServletRequest request) {
+        
+        try {
+            User user = getUser.userFromToken(request);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
+
+            boolean isSaved = productService.isProductSavedByUser(user.getUserId(), productId);
+
+            return ResponseEntity.ok(isSaved);
+
+        } catch (Exception e) {
+            logger.error("Error checking if product is saved", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error: " + e.getMessage());
+        }
+    }
 }

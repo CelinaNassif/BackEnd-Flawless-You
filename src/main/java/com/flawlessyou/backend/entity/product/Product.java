@@ -19,15 +19,18 @@ public class Product {
     private String adminId;// هاد اليوزر الي ضاف البرودكت 
     private List<String> photos;
     private Map<String, Integer> reviews;
+ 
     public Product(String name, List<Type> skinType, String description, List<String> ingredients
 ) {
         this.name = name;
         this.skinType = skinType;
         this.description = description;
         this.ingredients = ingredients;
+  
       
         
     }
+    
     public String getProductId() {
         return productId;
     }
@@ -77,8 +80,7 @@ public class Product {
         this.reviews = reviews;
     }
 
-   
-
+    
 
     
 }
