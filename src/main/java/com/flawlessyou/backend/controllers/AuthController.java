@@ -35,7 +35,8 @@ import jakarta.validation.Valid;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
@@ -54,24 +55,8 @@ public class AuthController {
     private JwtUtils jwtUtils;
 
    public GetUser getUser;
-
-    // @GetMapping("/swagger-ui")
-    // public ResponseEntity<Object> redirectToSwagger() {
-     
-    //     Authentication authentication = authenticationManager.authenticate(
-    //         new UsernamePasswordAuthenticationToken("mai", "password123")
-    //     );
-
-    //     SecurityContextHolder.getContext().setAuthentication(authentication);
-
-    //     String token = jwtUtils.generateJwtToken(authentication);
-
-    //     HttpHeaders headers = new HttpHeaders();
-    //     headers.add("Authorization", "Bearer " + token);
-    //     headers.add("Location", "/index.html");
-
-    //     return new ResponseEntity<>(headers, HttpStatus.FOUND);
-    // }
+   private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+  
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -82,14 +67,14 @@ public class AuthController {
                     loginRequest.getPassword()
                 )
             );
-
+    
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtUtils.generateJwtToken(authentication);
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
-
+    
             return ResponseEntity.ok(new JwtResponse(
                 jwt,
                 userDetails.getId(),
@@ -97,16 +82,17 @@ public class AuthController {
                 userDetails.getEmail(),
                 roles
             ));
-
+    
         } catch (BadCredentialsException e) {
+            logger.error("Authentication failed: Invalid username or password", e);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new MessageResponse("Invalid username or password"));
         } catch (Exception e) {
+            logger.error("An error occurred during authentication", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new MessageResponse("An error occurred during authentication"));
+                .body(new MessageResponse("An error occurred during authentication: " + e.getMessage()));
         }
     }
-
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         try {

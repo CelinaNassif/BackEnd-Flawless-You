@@ -154,24 +154,24 @@ public Product deleteReview(String productId, String userId) throws ExecutionExc
 
 
 public void toggleProductForUser(String userId, String productId) 
-throws ExecutionException, InterruptedException {
+    throws ExecutionException, InterruptedException {
 
-DocumentReference userRef = firestore.collection(USERS_COLLECTION).document(userId);
+    DocumentReference userRef = firestore.collection(USERS_COLLECTION).document(userId);
+    DocumentSnapshot userSnapshot = userRef.get().get();
+    List<String> savedProductIds = (List<String>) userSnapshot.get("savedProductIds");
 
-DocumentSnapshot userSnapshot = userRef.get().get();
-List<String> savedProductIds = (List<String>) userSnapshot.get("savedProductIds");
+    if (savedProductIds == null) {
+        savedProductIds = new ArrayList<>();
+    }
 
-if (savedProductIds == null) {
-    savedProductIds = new ArrayList<>();
+    if (savedProductIds.contains(productId)) {
+        savedProductIds.remove(productId); 
+    } else {
+        savedProductIds.add(productId); 
+    }
+
+    userRef.update("savedProductIds", savedProductIds).get();
 }
-
-if (savedProductIds.contains(productId)) {
-    userRef.update("savedProductIds", FieldValue.arrayRemove(productId)).get();
-} else {
-    userRef.update("savedProductIds", FieldValue.arrayUnion(productId)).get();
-}
-}
-
 
 
 public boolean isProductSavedByUser(String userId, String productId) 

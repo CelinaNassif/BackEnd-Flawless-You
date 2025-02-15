@@ -26,7 +26,7 @@ public class User {
     private String profilePicture;
     private LocalDate dateOfBirth;
     private List<String> skinAnalysisHistoryIds;// نتأكد منهم اذا سترنج ولا skinAnalisis
-    private Set<String> savedProductIds;// نتأكد
+    private List<String> savedProductIds;// نتأكد
     private List<String> reviewIds;// نتأكد
   private Collection<? extends GrantedAuthority> authorities; 
   
@@ -125,10 +125,10 @@ public class User {
     public void setSkinAnalysisHistoryIds(List<String> skinAnalysisHistoryIds) {
         this.skinAnalysisHistoryIds = skinAnalysisHistoryIds;
     }
-    public Set<String> getSavedProductIds() {
+    public List<String> getSavedProductIds() {
         return savedProductIds;
     }
-    public void setSavedProductIds(Set<String> savedProductIds) {
+    public void setSavedProductIds(List<String> savedProductIds) {
         this.savedProductIds = savedProductIds;
     }
     public List<String> getReviewIds() {
