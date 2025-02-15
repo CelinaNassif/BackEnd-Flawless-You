@@ -193,4 +193,29 @@ return savedProductIds.contains(productId);
 
 
 
+
+public List<Product> getSavedProducts(String userId) throws ExecutionException, InterruptedException {
+    DocumentReference userRef = firestore.collection(USERS_COLLECTION).document(userId);
+    DocumentSnapshot userSnapshot = userRef.get().get();
+    
+    List<String> savedProductIds = (List<String>) userSnapshot.get("savedProductIds");
+    
+    if (savedProductIds == null || savedProductIds.isEmpty()) {
+        return Collections.emptyList(); 
+    }
+    
+    List<Product> savedProducts = new ArrayList<>();
+    
+    for (String productId : savedProductIds) {
+        DocumentReference productRef = firestore.collection(COLLECTION_NAME).document(productId);
+        DocumentSnapshot productSnapshot = productRef.get().get();
+        
+        if (productSnapshot.exists()) {
+            savedProducts.add(productSnapshot.toObject(Product.class));
+        }
+    }
+    
+    return savedProducts;
+}
+
 }
