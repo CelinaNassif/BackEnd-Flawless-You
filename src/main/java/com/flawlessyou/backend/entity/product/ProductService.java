@@ -218,4 +218,44 @@ public List<Product> getSavedProducts(String userId) throws ExecutionException, 
     return savedProducts;
 }
 
+
+
+
+
+
+
+
+
+public void deleteProduct(String productId) throws ExecutionException, InterruptedException {
+    DocumentReference productRef = firestore.collection(COLLECTION_NAME).document(productId);
+    DocumentSnapshot productSnapshot = productRef.get().get();
+    
+    if (productSnapshot.exists()) {
+        productRef.delete().get();
+        System.out.println("Product with ID " + productId + " has been deleted.");
+    } else {
+        System.out.println("Product with ID " + productId + " does not exist.");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
