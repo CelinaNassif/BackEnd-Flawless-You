@@ -218,4 +218,26 @@ public List<Product> getSavedProducts(String userId) throws ExecutionException, 
     return savedProducts;
 }
 
+
+
+public Integer getUserReviewForProduct(String productId, String userId) throws ExecutionException, InterruptedException {
+    if (productId == null || productId.isEmpty()) {
+        throw new IllegalArgumentException("Product ID cannot be null or empty");
+    }
+
+    DocumentReference productRef = firestore.collection(COLLECTION_NAME).document(productId);
+    DocumentSnapshot snapshot = productRef.get().get();
+
+    if (!snapshot.exists()) {
+        throw new IllegalArgumentException("Product not found!");
+    }
+
+    Map<String, Integer> reviews = (Map<String, Integer>) snapshot.get("reviews");
+
+    if (reviews == null || reviews.isEmpty()) {
+        throw new IllegalArgumentException("No reviews found for this product");
+    }
+
+    return reviews.get(userId); 
+}
 }

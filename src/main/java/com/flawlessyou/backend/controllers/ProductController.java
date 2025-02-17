@@ -265,6 +265,30 @@ public ResponseEntity<?> getRandomProducts(
 
 
 
-
+    @GetMapping("/{productId}/userReview")
+    public ResponseEntity<?> getUserReviewForProduct(
+            @PathVariable String productId,
+            HttpServletRequest request) {
+        
+        try {
+            User user = getUser.userFromToken(request);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
+    
+            Integer userReview = productService.getUserReviewForProduct(productId, user.getUserId());
+    
+            if (userReview == null) {
+                return ResponseEntity.ok(0);
+            }
+    
+            return ResponseEntity.ok(userReview);
+    
+        } catch (Exception e) {
+            logger.error("Error getting user review", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error: " + e.getMessage());
+        }
+    }
     
 }
