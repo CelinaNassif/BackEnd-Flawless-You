@@ -220,6 +220,10 @@ public List<Product> getSavedProducts(String userId) throws ExecutionException, 
 
 
 
+
+
+
+
 public Integer getUserReviewForProduct(String productId, String userId) throws ExecutionException, InterruptedException {
     if (productId == null || productId.isEmpty()) {
         throw new IllegalArgumentException("Product ID cannot be null or empty");
@@ -240,4 +244,38 @@ public Integer getUserReviewForProduct(String productId, String userId) throws E
 
     return reviews.get(userId); 
 }
+
+
+public void deleteProduct(String productId) throws ExecutionException, InterruptedException {
+    DocumentReference productRef = firestore.collection(COLLECTION_NAME).document(productId);
+    DocumentSnapshot productSnapshot = productRef.get().get();
+    
+    if (productSnapshot.exists()) {
+        productRef.delete().get();
+        System.out.println("Product with ID " + productId + " has been deleted.");
+    } else {
+        System.out.println("Product with ID " + productId + " does not exist.");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
