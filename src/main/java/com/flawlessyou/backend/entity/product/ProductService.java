@@ -261,7 +261,26 @@ public void deleteProduct(String productId) throws ExecutionException, Interrupt
 
 
 
+public List<Product> searchProductsByName(String searchTerm) throws ExecutionException, InterruptedException {
+  
+    String lowerCaseSearchTerm = searchTerm.toLowerCase();
 
+
+    Query query = firestore.collection(COLLECTION_NAME)
+            .whereGreaterThanOrEqualTo("name", lowerCaseSearchTerm)
+            .whereLessThanOrEqualTo("name", lowerCaseSearchTerm + "\uf8ff");
+
+    ApiFuture<QuerySnapshot> future = query.get();
+    List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+   
+    List<Product> products = new ArrayList<>();
+    for (QueryDocumentSnapshot document : documents) {
+        products.add(document.toObject(Product.class));
+    }
+
+    return products;
+}
 
 
 
