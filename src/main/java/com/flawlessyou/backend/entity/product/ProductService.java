@@ -36,7 +36,7 @@ public class ProductService {
         } else {
             docRef = firestore.collection(COLLECTION_NAME).document(product.getProductId());
         }
-        
+        product.setName(product.getName().toLowerCase());
         docRef.set(product).get();
         return product;
     }
@@ -260,20 +260,20 @@ public void deleteProduct(String productId) throws ExecutionException, Interrupt
 
 
 
-
 public List<Product> searchProductsByName(String searchTerm) throws ExecutionException, InterruptedException {
-  
+    // تحويل النص المدخل إلى أحرف صغيرة
     String lowerCaseSearchTerm = searchTerm.toLowerCase();
 
-
+    // إنشاء استعلام للبحث الجزئي
     Query query = firestore.collection(COLLECTION_NAME)
             .whereGreaterThanOrEqualTo("name", lowerCaseSearchTerm)
             .whereLessThanOrEqualTo("name", lowerCaseSearchTerm + "\uf8ff");
 
+    // تنفيذ الاستعلام
     ApiFuture<QuerySnapshot> future = query.get();
     List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
-   
+    // تحويل النتائج إلى قائمة من المنتجات
     List<Product> products = new ArrayList<>();
     for (QueryDocumentSnapshot document : documents) {
         products.add(document.toObject(Product.class));
@@ -281,10 +281,6 @@ public List<Product> searchProductsByName(String searchTerm) throws ExecutionExc
 
     return products;
 }
-
-
-
-
 
 
 
