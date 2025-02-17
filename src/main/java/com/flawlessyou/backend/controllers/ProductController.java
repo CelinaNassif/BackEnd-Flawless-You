@@ -365,6 +365,33 @@ public ResponseEntity<?> getRandomProducts(
                    .body("Error: " + e.getMessage());
         }
     }
+
+
+    @GetMapping("/search")
+    public List<Product> searchProductsByName(@RequestParam String name) throws ExecutionException, InterruptedException {
+        return productService.searchProductsByName(name);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
 }
 
