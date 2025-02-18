@@ -239,8 +239,7 @@ public Integer getUserReviewForProduct(String productId, String userId) throws E
     Map<String, Integer> reviews = (Map<String, Integer>) snapshot.get("reviews");
 
     if (reviews == null || reviews.isEmpty()) {
-        throw new IllegalArgumentException("No reviews found for this product");
-    }
+        return 0;     }
 
     return reviews.get(userId); 
 }
