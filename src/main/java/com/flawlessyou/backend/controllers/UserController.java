@@ -12,7 +12,11 @@ import com.flawlessyou.backend.entity.cloudinary.CloudinaryService;
 import com.flawlessyou.backend.entity.user.User;
 import com.flawlessyou.backend.entity.user.UserService;
 import com.flawlessyou.backend.util.FileUploadUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import com.flawlessyou.backend.Security.Jwt.JwtUtils;
+import com.flawlessyou.backend.config.GetUser;
 import com.flawlessyou.backend.Payload.Response.MessageResponse;
 
 import java.util.HashMap;
@@ -23,6 +27,9 @@ import java.util.concurrent.ExecutionException;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+
+    @Autowired
+    private GetUser getUser;
     
     @Autowired
     private JwtUtils jwtUtils;
@@ -50,6 +57,22 @@ public class UserController {
                 .body(new MessageResponse("Error fetching user details: " + e.getMessage()));
         }
     }
+    
+    @GetMapping("/userName")
+    public ResponseEntity<?> getUserName( HttpServletRequest request) {
+        try {
+            User user = getUser.userFromToken(request);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
+            return ResponseEntity.ok(user.getUserName());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new MessageResponse("Error fetching user details: " + e.getMessage()));
+        }
+    }
+
+
 
     @PostMapping("/profile-picture")
     public ResponseEntity<?> uploadProfilePicture(

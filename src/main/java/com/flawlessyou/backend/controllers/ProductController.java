@@ -42,6 +42,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -365,6 +366,50 @@ public ResponseEntity<?> getRandomProducts(
                    .body("Error: " + e.getMessage());
         }
     }
+
+
+    @GetMapping("/search")
+    public List<Product> searchProductsByName(@RequestParam String name) throws ExecutionException, InterruptedException {
+        return productService.searchProductsByName(name);
+    }
+
+
+
+
+
+    @PutMapping("/{productId}/reviews")
+    public ResponseEntity<?> updateUserReview(
+            @PathVariable String productId,
+            HttpServletRequest request, @RequestBody Map<String, Integer> requestBody) {
+        try {
+            User user = getUser.userFromToken(request);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
+    
+            Integer rating = requestBody.get("rating");
+            if (rating == null || rating < 0 || rating > 5) {
+                throw new IllegalArgumentException("Rating must be between 0 and 5");
+            }
+    
+            Product updatedProduct = productService.updateUserReview(productId, user.getUserId(), rating);
+            return ResponseEntity.ok(rating);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     
 }
 

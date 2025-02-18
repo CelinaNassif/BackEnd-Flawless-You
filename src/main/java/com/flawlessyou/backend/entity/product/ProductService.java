@@ -2,8 +2,15 @@ package com.flawlessyou.backend.entity.product;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +43,7 @@ public class ProductService {
         } else {
             docRef = firestore.collection(COLLECTION_NAME).document(product.getProductId());
         }
-        
+        product.setName(product.getName().toLowerCase());
         docRef.set(product).get();
         return product;
     }
@@ -235,13 +242,20 @@ public Integer getUserReviewForProduct(String productId, String userId) throws E
     if (!snapshot.exists()) {
         throw new IllegalArgumentException("Product not found!");
     }
-
-    Map<String, Integer> reviews = (Map<String, Integer>) snapshot.get("reviews");
+    Map<String, Object> reviews = (Map<String, Object>) snapshot.get("reviews");
 
     if (reviews == null || reviews.isEmpty()) {
-        return 0;     }
+        return 0;
+    }
+    Object userReview = reviews.get(userId);
 
-    return reviews.get(userId); 
+    if (userReview instanceof Long) {
+        return ((Long) userReview).intValue();
+    } else if (userReview instanceof Integer) {
+        return (Integer) userReview; 
+    } else {
+        return 0; 
+    }
 }
 
 
@@ -259,19 +273,56 @@ public void deleteProduct(String productId) throws ExecutionException, Interrupt
 
 
 
+public List<Product> searchProductsByName(String searchTerm) throws ExecutionException, InterruptedException {
+
+    String lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+    Query query = firestore.collection(COLLECTION_NAME)
+            .whereGreaterThanOrEqualTo("name", lowerCaseSearchTerm)
+            .whereLessThanOrEqualTo("name", lowerCaseSearchTerm + "\uf8ff");
+
+   
+    ApiFuture<QuerySnapshot> future = query.get();
+    List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+
+    List<Product> products = new ArrayList<>();
+    for (QueryDocumentSnapshot document : documents) {
+        products.add(document.toObject(Product.class));
+    }
+
+    return products;
+}
 
 
 
 
+public Product updateUserReview(String productId, String userId, int newRating) 
+    throws ExecutionException, InterruptedException {
+    
+    if (productId == null || productId.isEmpty()) {
+        throw new IllegalArgumentException("Product ID cannot be null or empty");
+    }
 
+    DocumentReference productRef = firestore.collection(COLLECTION_NAME).document(productId);
+    DocumentSnapshot snapshot = productRef.get().get();
 
+    if (!snapshot.exists()) {
+        throw new IllegalArgumentException("Product not found!");
+    }
 
+    Map<String, Object> reviews = (Map<String, Object>) snapshot.get("reviews");
 
+    if (reviews == null) {
+        reviews = new HashMap<>();
+    }
 
+    reviews.put(userId, newRating);
 
+    productRef.update("reviews", reviews).get();
 
-
-
+    return productRef.get().get().toObject(Product.class);
+}
 
 
 
