@@ -28,8 +28,10 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password;
 
-    private List<SimpleGrantedAuthority> authorities;    // Constructor with all fields
-    public UserDetailsImpl(String id, String username, String email, String password, List<SimpleGrantedAuthority> authorities) {
+    private Collection<? extends GrantedAuthority> authorities;
+
+    // Constructor with all fields
+    public UserDetailsImpl(String id, String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -49,8 +51,9 @@ public class UserDetailsImpl implements UserDetails {
 
         // Create a SimpleGrantedAuthority from the user's role
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
-    List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-    authorities.add(authority);
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(authority);
+
         // Log the user role for debugging
         logger.info("User role: " + user.getRole().name());
 
@@ -65,7 +68,7 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     @Override
-    public List<SimpleGrantedAuthority> getAuthorities() {
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
 
