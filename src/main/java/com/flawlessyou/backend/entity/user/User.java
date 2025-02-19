@@ -28,7 +28,7 @@ public class User {
     private List<String> skinAnalysisHistoryIds;// نتأكد منهم اذا سترنج ولا skinAnalisis
     private List<String> savedProductIds;// نتأكد
     private List<String> reviewIds;// نتأكد
-  private Collection<? extends GrantedAuthority> authorities; 
+    private List<? extends GrantedAuthority> authorities;
   
     public User( String userName, String email,  String hashedPassword) {
        
@@ -52,13 +52,14 @@ public class User {
         this.profilePicture = profilePicture;
         this.dateOfBirth = dateOfBirth;
     }
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public List<? extends GrantedAuthority> getAuthorities() { 
         return authorities;
     }
 
-    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
+    public void setAuthorities(List<? extends GrantedAuthority> authorities) { 
         this.authorities = authorities;
     }
+
     public String getUserId() {
         return userId;
     }
