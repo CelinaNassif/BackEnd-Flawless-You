@@ -142,14 +142,8 @@ public class UserController {
             if (user == null) {
                 return ResponseEntity.notFound().build();
             }
-            
-            // Return only public information
-            Map<String, Object> publicInfo = new HashMap<>();
-            publicInfo.put("userId", user.getUserId());
-            publicInfo.put("username", user.getUserName());
-            publicInfo.put("profilePicture", user.getProfilePicture());
-            
-            return ResponseEntity.ok(publicInfo);
+  
+            return ResponseEntity.ok(user);
             
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

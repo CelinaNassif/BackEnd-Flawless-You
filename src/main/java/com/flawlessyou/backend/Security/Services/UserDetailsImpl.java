@@ -27,16 +27,15 @@ public class UserDetailsImpl implements UserDetails {
 
     @JsonIgnore
     private String password;
-
-    private Collection<? extends GrantedAuthority> authorities;
-
+    private Role role;
+    // private Collection<SimpleGrantedAuthority> authorities; 
     // Constructor with all fields
-    public UserDetailsImpl(String id, String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserDetailsImpl(String id, String username, String email, String password, Role role) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
-        this.authorities = authorities;
+        this.role = role;
     }
 
     // Default constructor for deserialization
@@ -63,13 +62,13 @@ public class UserDetailsImpl implements UserDetails {
             user.getUserName(),
             user.getEmail(),
             user.getHashedPassword(),
-            authorities // Wrap the authority in a list
+            user.getRole()  // Wrap the authority in a list
         );
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     public String getId() {

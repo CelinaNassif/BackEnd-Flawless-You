@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -28,8 +29,7 @@ public class User {
     private List<String> skinAnalysisHistoryIds;// نتأكد منهم اذا سترنج ولا skinAnalisis
     private List<String> savedProductIds;// نتأكد
     private List<String> reviewIds;// نتأكد
-    private List<? extends GrantedAuthority> authorities;
-  
+    // private List<SimpleGrantedAuthority> authorities;   
     public User( String userName, String email,  String hashedPassword) {
        
         this.userId = UUID.randomUUID().toString();
@@ -52,14 +52,13 @@ public class User {
         this.profilePicture = profilePicture;
         this.dateOfBirth = dateOfBirth;
     }
-    public List<? extends GrantedAuthority> getAuthorities() { 
-        return authorities;
-    }
+    // public List<SimpleGrantedAuthority> getAuthorities() {
+    //     return authorities;
+    // }
 
-    public void setAuthorities(List<? extends GrantedAuthority> authorities) { 
-        this.authorities = authorities;
-    }
-
+    // public void setAuthorities(List<SimpleGrantedAuthority> authorities) {
+    //     this.authorities = authorities;
+    // }
     public String getUserId() {
         return userId;
     }
