@@ -123,15 +123,14 @@ public class UserController {
             // Debugging: Print the newUser object to check the date format
             System.out.println("New User Date of Birth: " + newUser.getDateOfBirth());
     
-            // Update fields if values are not null
-            if (newUser.getUserName() != null) {
+            // Update fields if values are not null and not empty
+            if (newUser.getUserName() != null && !newUser.getUserName().isEmpty()) {
                 user.setUserName(newUser.getUserName());
             }
-            if (newUser.getEmail() != null) {
+            if (newUser.getEmail() != null && !newUser.getEmail().isEmpty()) {
                 user.setEmail(newUser.getEmail());
             }
-           
-            if (newUser.getPhoneNumber() != null) {
+            if (newUser.getPhoneNumber() != null && !newUser.getPhoneNumber().isEmpty()) {
                 user.setPhoneNumber(newUser.getPhoneNumber());
             }
             if (newUser.getGender() != null) {
