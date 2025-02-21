@@ -16,12 +16,22 @@ public class Card {
     
     
 
-    public Card( String expertId, String message) {
-       this.id = UUID.randomUUID().toString(); // توليد معرف فريد
-        this.expertId = expertId;
-        this.message = message;
-        
+    public Card() {
+        this.id = UUID.randomUUID().toString(); // توليد معرف فريد
     }
+
+
+
+
+
+
+    
+    // public Card( String expertId, String message) {
+    //    this.id = UUID.randomUUID().toString(); // توليد معرف فريد
+    //     this.expertId = expertId;
+    //     this.message = message;
+        
+    // }
     public String getId() {
         return id;
     }

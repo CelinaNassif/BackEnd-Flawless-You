@@ -13,6 +13,8 @@ import com.flawlessyou.backend.entity.user.User;
 import com.flawlessyou.backend.entity.user.UserService;
 import com.flawlessyou.backend.util.FileUploadUtil;
 import com.flawlessyou.backend.entity.user.Gender;
+import com.flawlessyou.backend.entity.user.Role;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import com.flawlessyou.backend.Security.Jwt.JwtUtils;
@@ -28,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -165,4 +168,20 @@ public class UserController {
     }
 
   
+
+
+
+@GetMapping("/experts")
+    public List<String> getExperts() throws ExecutionException, InterruptedException {
+        // قم بجلب جميع المستخدمين الذين لديهم دور SKIN_EXPERT
+        List<User> experts = userService.getUsersByRole(Role.SKIN_EXPERT);
+
+        // استخراج أسماء الخبراء فقط
+        return experts.stream()
+                .map(User::getUserName)
+                .collect(Collectors.toList());
+    }
+
+
+
 }
