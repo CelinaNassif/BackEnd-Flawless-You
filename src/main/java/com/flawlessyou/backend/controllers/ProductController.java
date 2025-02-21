@@ -369,13 +369,22 @@ public ResponseEntity<?> getRandomProducts(
     }
 
 
- @GetMapping("/search")
+//  @GetMapping("/search")
+// public List<Product> searchProductsByName(@RequestParam String name) throws ExecutionException, InterruptedException {
+//     return productService.getAllProducts().stream()
+//             .filter(product -> product.getName().toLowerCase().contains(name.toLowerCase()))
+//             .collect(Collectors.toList());
+// }
+
+@GetMapping("/search")
 public List<Product> searchProductsByName(@RequestParam String name) throws ExecutionException, InterruptedException {
+    if (name == null || name.trim().isEmpty()) {
+        return productService.getAllProducts(); // or return an empty list, depending on your requirements
+    }
     return productService.getAllProducts().stream()
-            .filter(product -> product.getName().toLowerCase().contains(name.toLowerCase()))
+            .filter(product -> product.getName() != null && product.getName().toLowerCase().contains(name.toLowerCase()))
             .collect(Collectors.toList());
 }
-
 
 
     @PutMapping("/{productId}/reviews")
