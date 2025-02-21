@@ -120,6 +120,9 @@ public class UserController {
             // Get user from token
             User user = getUser.userFromToken(request);
     
+            // Debugging: Print the newUser object to check the date format
+            System.out.println("New User Date of Birth: " + newUser.getDateOfBirth());
+    
             // Update fields if values are not null
             if (newUser.getUserName() != null) {
                 user.setUserName(newUser.getUserName());
@@ -128,7 +131,6 @@ public class UserController {
                 user.setEmail(newUser.getEmail());
             }
             if (newUser.getDateOfBirth() != null) {
-                System.out.println("Date of Birth: " + newUser.getDateOfBirth()); // Debugging
                 user.setDateOfBirth(newUser.getDateOfBirth());
             }
             if (newUser.getPhoneNumber() != null) {
@@ -143,6 +145,8 @@ public class UserController {
     
             return ResponseEntity.ok(new MessageResponse("User updated successfully"));
         } catch (Exception e) {
+            // Log the full error for debugging
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new MessageResponse("Error updating user: " + e.getMessage()));
         }

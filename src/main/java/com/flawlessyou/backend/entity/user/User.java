@@ -1,7 +1,7 @@
 package com.flawlessyou.backend.entity.user;
 // import com.flawlessyou.backend.entity.user.Role;
 
-import java.time.LocalDate;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -26,8 +26,7 @@ public class User {
     private String hashedPassword;
     public Role role;
     private String profilePicture;
-     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate dateOfBirth;
+    private Timestamp dateOfBirth;
     private List<String> skinAnalysisHistoryIds;// نتأكد منهم اذا سترنج ولا skinAnalisis
     private List<String> savedProductIds;// نتأكد
     private List<String> reviewIds;// نتأكد
@@ -44,7 +43,7 @@ public class User {
 
 
     
-    public User(String userName, String email, String phoneNumber, Gender gender, LocalDate dateOfBirth) {
+    public User(String userName, String email, String phoneNumber, Gender gender, Timestamp dateOfBirth) {
         this.userName = userName;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -55,7 +54,7 @@ public class User {
 
 
     public User( String userName, String email, String phoneNumber, Gender gender, String skinType,
-            String hashedPassword, String profilePicture, LocalDate dateOfBirth) {
+            String hashedPassword, String profilePicture, Timestamp dateOfBirth) {
                 this.userId = UUID.randomUUID().toString();
 
         this.userName = userName;
@@ -128,10 +127,10 @@ public class User {
     public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
     }
-    public LocalDate getDateOfBirth() {
+    public Timestamp getDateOfBirth() {
         return dateOfBirth;
     }
-    public void setDateOfBirth(LocalDate dateOfBirth) {
+    public void setDateOfBirth(Timestamp dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
     public List<String> getSkinAnalysisHistoryIds() {
