@@ -8,6 +8,7 @@ import com.google.firebase.cloud.FirestoreClient;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class cardService {
+      @Autowired
 private GetUser getUser;
     private static final String COLLECTION_NAME = "cards";
 

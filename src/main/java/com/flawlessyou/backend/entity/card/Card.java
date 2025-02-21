@@ -1,6 +1,7 @@
 package com.flawlessyou.backend.entity.card;
 
 import java.util.Date;
+import java.util.UUID;
 
 public class Card {
 
@@ -13,14 +14,13 @@ public class Card {
     private Date replyDate;
 
     
-    public Card() {
-    }
+    
 
-    public Card(String id, String expertId, String message, String expertReply) {
-        this.id = id;
+    public Card( String expertId, String message) {
+       this.id = UUID.randomUUID().toString(); // توليد معرف فريد
         this.expertId = expertId;
         this.message = message;
-        this.expertReply = expertReply;
+        
     }
     public String getId() {
         return id;
