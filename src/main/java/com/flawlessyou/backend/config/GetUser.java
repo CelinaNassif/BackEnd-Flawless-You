@@ -56,10 +56,21 @@ public class GetUser {
 
         User user = userService.findByUsername(username)
             .orElseThrow(() -> new Exception("User not found"));
-        user.setAuthorities(roles.stream()
-            .map(SimpleGrantedAuthority::new)
-            .collect(Collectors.toList()));
+        // user.setAuthorities(roles.stream()
+        //     .map(SimpleGrantedAuthority::new)
+        //     .collect(Collectors.toList()));
         return user;
+    }
+    throw new Exception("Invalid token");
+}
+
+
+public List<String> getRolesFromToken(HttpServletRequest request) throws Exception {
+    String jwt = parseJwt(request);
+    if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+        Claims claims = jwtUtils.getClaimsFromToken(jwt);
+        List<String> roles = claims.get("roles", List.class);
+        return (roles != null) ? roles : new ArrayList<>();
     }
     throw new Exception("Invalid token");
 }

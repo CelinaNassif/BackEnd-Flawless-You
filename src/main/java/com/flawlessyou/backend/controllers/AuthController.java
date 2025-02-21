@@ -28,6 +28,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -111,8 +112,11 @@ public class AuthController {
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword())
             );
-            user.setRole(Role.USER);
-
+        
+        //     SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
+        // List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        // authorities.add(authority);
+        user.setRole(Role.USER);
             userService.saveUser(user);
             return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 

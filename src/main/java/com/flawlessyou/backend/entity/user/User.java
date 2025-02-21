@@ -1,6 +1,7 @@
 package com.flawlessyou.backend.entity.user;
 // import com.flawlessyou.backend.entity.user.Role;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -8,7 +9,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.NoArgsConstructor;
@@ -28,8 +31,7 @@ public class User {
     private List<String> skinAnalysisHistoryIds;// نتأكد منهم اذا سترنج ولا skinAnalisis
     private List<String> savedProductIds;// نتأكد
     private List<String> reviewIds;// نتأكد
-    private List<? extends GrantedAuthority> authorities;
-  
+    // private List<SimpleGrantedAuthority> authorities;   
     public User( String userName, String email,  String hashedPassword) {
        
         this.userId = UUID.randomUUID().toString();
@@ -39,6 +41,19 @@ public class User {
 
    
     }
+
+
+    
+    public User(String userName, String email, String phoneNumber, Gender gender) {
+        this.userName = userName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.gender = gender;
+       
+    }
+
+
+
     public User( String userName, String email, String phoneNumber, Gender gender, String skinType,
             String hashedPassword, String profilePicture, LocalDate dateOfBirth) {
                 this.userId = UUID.randomUUID().toString();
@@ -52,14 +67,13 @@ public class User {
         this.profilePicture = profilePicture;
         this.dateOfBirth = dateOfBirth;
     }
-    public List<? extends GrantedAuthority> getAuthorities() { 
-        return authorities;
-    }
+    // public List<SimpleGrantedAuthority> getAuthorities() {
+    //     return authorities;
+    // }
 
-    public void setAuthorities(List<? extends GrantedAuthority> authorities) { 
-        this.authorities = authorities;
-    }
-
+    // public void setAuthorities(List<SimpleGrantedAuthority> authorities) {
+    //     this.authorities = authorities;
+    // }
     public String getUserId() {
         return userId;
     }

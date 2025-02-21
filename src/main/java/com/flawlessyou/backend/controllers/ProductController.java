@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -368,12 +369,12 @@ public ResponseEntity<?> getRandomProducts(
     }
 
 
-    @GetMapping("/search")
-    public List<Product> searchProductsByName(@RequestParam String name) throws ExecutionException, InterruptedException {
-        return productService.searchProductsByName(name);
-    }
-
-
+ @GetMapping("/search")
+public List<Product> searchProductsByName(@RequestParam String name) throws ExecutionException, InterruptedException {
+    return productService.getAllProducts().stream()
+            .filter(product -> product.getName().toLowerCase().contains(name.toLowerCase()))
+            .collect(Collectors.toList());
+}
 
 
 

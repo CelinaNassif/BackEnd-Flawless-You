@@ -257,7 +257,18 @@ public Integer getUserReviewForProduct(String productId, String userId) throws E
         return 0; 
     }
 }
-
+public List<Product> getAllProducts() throws ExecutionException, InterruptedException {
+    ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION_NAME).get();
+    
+    List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+    
+    List<Product> products = new ArrayList<>();
+    for (QueryDocumentSnapshot document : documents) {
+        products.add(document.toObject(Product.class));
+    }
+    
+    return products;
+}
 
 public void deleteProduct(String productId) throws ExecutionException, InterruptedException {
     DocumentReference productRef = firestore.collection(COLLECTION_NAME).document(productId);
