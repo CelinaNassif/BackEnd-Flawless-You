@@ -12,13 +12,18 @@ import com.flawlessyou.backend.entity.cloudinary.CloudinaryService;
 import com.flawlessyou.backend.entity.user.User;
 import com.flawlessyou.backend.entity.user.UserService;
 import com.flawlessyou.backend.util.FileUploadUtil;
-
+import com.flawlessyou.backend.entity.user.Gender;
 import jakarta.servlet.http.HttpServletRequest;
 
 import com.flawlessyou.backend.Security.Jwt.JwtUtils;
 import com.flawlessyou.backend.config.GetUser;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.flawlessyou.backend.Payload.Response.MessageResponse;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,32 +114,39 @@ public class UserController {
 
     @PutMapping("/update")
     public ResponseEntity<?> updateUser(
-        HttpServletRequest request,
-            @RequestBody Map<String, String> updates) {
+        HttpServletRequest request, @RequestBody User newUser
+    ) {
         try {
+            // Get user from token
             User user = getUser.userFromToken(request);
-            
-            if (updates.containsKey("username")) {
-                String newUsername = updates.get("username");
-                if (userService.existsByUsername(newUsername) && 
-                    !newUsername.equals(user.getUserName())) {
-                    return ResponseEntity.badRequest()
-                        .body(new MessageResponse("Username already taken"));
-                }
-                user.setUserName(newUsername);
+    
+            // Update fields if values are not null
+            if (newUser.getUserName() != null) {
+                user.setUserName(newUser.getUserName());
             }
-            
-            // Add more updateable fields as needed
-            
+            if (newUser.getEmail() != null) {
+                user.setEmail(newUser.getEmail());
+            }
+            if (newUser.getDateOfBirth() != null) {
+                System.out.println("Date of Birth: " + newUser.getDateOfBirth()); // Debugging
+                user.setDateOfBirth(newUser.getDateOfBirth());
+            }
+            if (newUser.getPhoneNumber() != null) {
+                user.setPhoneNumber(newUser.getPhoneNumber());
+            }
+            if (newUser.getGender() != null) {
+                user.setGender(newUser.getGender());
+            }
+    
+            // Save updates to the database
             userService.saveUser(user);
+    
             return ResponseEntity.ok(new MessageResponse("User updated successfully"));
-            
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new MessageResponse("Error updating user: " + e.getMessage()));
         }
     }
-
     @GetMapping("/{userId}")
     public ResponseEntity<?> getUserById(@PathVariable String userId) {
         try {

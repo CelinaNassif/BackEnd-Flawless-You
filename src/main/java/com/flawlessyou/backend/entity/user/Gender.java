@@ -1,4 +1,4 @@
 package com.flawlessyou.backend.entity.user;
-enum Gender {
+public enum Gender {
     MALE, FEMALE
 }

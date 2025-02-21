@@ -77,4 +77,35 @@ public class UserService {
         DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(userId);
         docRef.update("profilePicture", profilePictureUrl).get();
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 }
