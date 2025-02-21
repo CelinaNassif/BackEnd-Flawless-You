@@ -3,8 +3,11 @@ package com.flawlessyou.backend.entity.user;
 import com.google.cloud.firestore.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -86,7 +89,16 @@ public class UserService {
 
 
 
-
+public List<User> getUsersByRole(Role role) throws ExecutionException, InterruptedException {
+    Query query = firestore.collection(COLLECTION_NAME)
+            .whereEqualTo("role", role);
+    
+    QuerySnapshot querySnapshot = query.get().get();
+    
+    return querySnapshot.getDocuments().stream()
+            .map(document -> document.toObject(User.class))
+            .collect(Collectors.toList());
+}
 
 
 
