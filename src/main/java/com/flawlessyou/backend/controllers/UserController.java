@@ -130,9 +130,7 @@ public class UserController {
             if (newUser.getEmail() != null) {
                 user.setEmail(newUser.getEmail());
             }
-            if (newUser.getDateOfBirth() != null) {
-                user.setDateOfBirth(newUser.getDateOfBirth());
-            }
+           
             if (newUser.getPhoneNumber() != null) {
                 user.setPhoneNumber(newUser.getPhoneNumber());
             }
