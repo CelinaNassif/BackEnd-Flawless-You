@@ -31,6 +31,7 @@ public class Routine {
     }
     
   public Routine() {
+    this.routineId = UUID.randomUUID().toString();
     }
 
 // Getters and setters (required for Firestore serialization/deserialization)
