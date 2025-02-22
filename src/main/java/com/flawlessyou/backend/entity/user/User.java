@@ -32,6 +32,8 @@ public class User {
     private List<String> savedProductIds;// نتأكد
     private List<String> reviewIds;// نتأكد
     // private List<SimpleGrantedAuthority> authorities;   
+
+    private List<String> routineId;
     public User( String userName, String email,  String hashedPassword) {
        
         this.userId = UUID.randomUUID().toString();
@@ -151,6 +153,18 @@ public class User {
     }
     public void setReviewIds(List<String> reviewIds) {
         this.reviewIds = reviewIds;
+    }
+
+
+
+    public List<String> getRoutineId() {
+        return routineId;
+    }
+
+
+
+    public void setRoutineId(List<String> routineId) {
+        this.routineId = routineId;
     }
   
     
