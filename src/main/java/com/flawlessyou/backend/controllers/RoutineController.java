@@ -1,5 +1,6 @@
 package com.flawlessyou.backend.controllers;
 
+
 import com.flawlessyou.backend.entity.routine.Routine;
 import com.flawlessyou.backend.entity.routine.RoutineService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,11 +19,7 @@ public class RoutineController {
 
     @PostMapping("/create")
     public Routine createRoutine(HttpServletRequest request,
-                                 @RequestParam String userId,
-                                 @RequestParam Map<String, Timestamp> productIds,
-                                 @RequestParam Timestamp timeAnalysis,
-                                 @RequestParam String description,
-                                 @RequestParam String analysisId) throws Exception {
-        return routineService.createRoutine(request, userId, productIds, timeAnalysis, description, analysisId);
+                                 @RequestBody Routine routine) throws Exception {
+        return routineService.createRoutine(request, routine);
     }
 }

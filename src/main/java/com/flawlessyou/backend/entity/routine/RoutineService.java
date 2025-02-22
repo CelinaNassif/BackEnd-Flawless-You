@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import com.google.cloud.firestore.*;
 
+@Service
 public class RoutineService {
     @Autowired
     private Firestore firestore;
@@ -27,31 +28,23 @@ public class RoutineService {
 
     private static final String COLLECTION_NAME = "routines";
 
-    public Routine createRoutine(HttpServletRequest request, String userId, Map<String, Timestamp> productIds,
-    Timestamp timeAnalysis, String description, String analysisId)
+    public Routine createRoutine(HttpServletRequest request , Routine routine)
 throws Exception {
-String routineId = UUID.randomUUID().toString();
-Routine routine = Routine.builder()
-.routineId(routineId)
-.userId(userId)
-.productIds(productIds)
-.timeAnalysis(timeAnalysis)
-.description(description)
-.analysisId(analysisId)
-.build();
+User user = getUser.userFromToken(request);
+routine.setUserId(user.getUserId());
 
 // Save the routine to Firestore
-ApiFuture<WriteResult> future = firestore.collection(COLLECTION_NAME).document(routineId).set(routine);
+ApiFuture<WriteResult> future = firestore.collection(COLLECTION_NAME).document(routine.getRoutineId()).set(routine);
 future.get(); // Wait for the operation to complete
 
 // Update the user's routine IDs
-User user = getUser.userFromToken(request);
+//User user = getUser.userFromToken(request);
 if (user != null) {
 List<String> routineIds = user.getRoutineId();
 if (routineIds == null) {
 routineIds = new ArrayList<>();
 }
-routineIds.add(routineId);
+routineIds.add(routine.getRoutineId());
 user.setRoutineId(routineIds);
 
 // Save the updated user back to the database
