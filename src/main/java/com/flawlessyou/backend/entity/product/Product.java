@@ -6,6 +6,8 @@ import lombok.Builder;
 import java.util.List;
 import java.util.Map;
 
+import com.flawlessyou.backend.entity.routine.RoutineTime;
+
 import jakarta.persistence.GeneratedValue;
 // @Data
 @NoArgsConstructor
@@ -19,7 +21,7 @@ public class Product {
     private String adminId;// هاد اليوزر الي ضاف البرودكت 
     private List<String> photos;
     private Map<String, Integer> reviews;
- 
+    private List<RoutineTime> usageTime;
     public Product(String name, List<Type> skinType, String description, List<String> ingredients
 ) {
         this.name = name;
@@ -78,6 +80,14 @@ public class Product {
     }
     public void setReviews(Map<String, Integer>  reviews) {
         this.reviews = reviews;
+    }
+
+    public List<RoutineTime> getUsageTime() {
+        return usageTime;
+    }
+
+    public void setUsageTime(List<RoutineTime> usageTime) {
+        this.usageTime = usageTime;
     }
 
     

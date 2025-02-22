@@ -31,9 +31,11 @@ public class User {
     private List<String> skinAnalysisHistoryIds;// نتأكد منهم اذا سترنج ولا skinAnalisis
     private List<String> savedProductIds;// نتأكد
     private List<String> reviewIds;// نتأكد
+
     // private List<SimpleGrantedAuthority> authorities;   
 
-    private List<String> routineId;
+    private String routineId;
+
     public User( String userName, String email,  String hashedPassword) {
        
         this.userId = UUID.randomUUID().toString();
@@ -157,13 +159,13 @@ public class User {
 
 
 
-    public List<String> getRoutineId() {
+    public String getRoutineId() {
         return routineId;
     }
 
 
 
-    public void setRoutineId(List<String> routineId) {
+    public void setRoutineId(String routineId) {
         this.routineId = routineId;
     }
   

@@ -15,12 +15,12 @@ public class Routine {
     private String routineId;
 
     private String userId;
-    private Map<String, RoutineTime> productIds;
+    private List<String> productIds;
     private String timeAnalysis;
     private String description;
     private String analysisId;
 
-    public Routine( Map<String, RoutineTime> productIds, String timeAnalysis, String description,
+    public Routine( List<String> productIds, String timeAnalysis, String description,
             String analysisId) {
         this.routineId = UUID.randomUUID().toString();
         this.productIds = productIds;
@@ -50,11 +50,11 @@ public void setUserId(String userId) {
     this.userId = userId;
 }
 
-public Map<String, RoutineTime> getProductIds() {
+public List<String> getProductIds() {
     return productIds;
 }
 
-public void setProductIds(Map<String, RoutineTime> productIds) {
+public void setProductIds(List<String> productIds ) {
     this.productIds = productIds;
 }
 

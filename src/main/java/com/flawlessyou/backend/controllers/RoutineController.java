@@ -1,8 +1,11 @@
 package com.flawlessyou.backend.controllers;
 
 
+import com.flawlessyou.backend.entity.product.Product;
 import com.flawlessyou.backend.entity.routine.Routine;
 import com.flawlessyou.backend.entity.routine.RoutineService;
+import com.flawlessyou.backend.entity.routine.RoutineTime;
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +60,16 @@ public class RoutineController {
     //     }
     // }
     @GetMapping("/userRoutine")
-    public List<Routine> getAllRoutinesForUser(HttpServletRequest request) throws  Exception {
-     return routineService.getAllRoutinesForUser(request);
+    public Routine getAllRoutinesForUser(HttpServletRequest request) throws  Exception {
+     return routineService.getRoutineUser(request);
+    }
+
+
+@GetMapping("/by-time")
+    public Map<RoutineTime, List<Product>> getRoutineWithProductsByTime(HttpServletRequest request) throws Exception {
+       
+        return routineService.getRoutineWithProductsByTime(request);
     }
 }
+
+
