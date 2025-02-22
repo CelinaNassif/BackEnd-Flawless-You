@@ -5,6 +5,7 @@ import com.flawlessyou.backend.entity.routine.Routine;
 import com.flawlessyou.backend.entity.routine.RoutineService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
@@ -19,14 +20,15 @@ public class RoutineController {
     private RoutineService routineService;
 
     @PostMapping("/create")
-    public Routine createRoutine(HttpServletRequest request,
+    public ResponseEntity<Routine> createRoutine(HttpServletRequest request,
                                  @RequestBody Routine routine) throws Exception {
-        return routineService.createRoutine(request, routine);
+        return ResponseEntity.ok(routineService.createRoutine(request, routine)) ;
     }
 
 
     @GetMapping("/{routineId}")
-    public Routine getRoutineById(@PathVariable String routineId) throws ExecutionException, InterruptedException {
-        return routineService.getRoutineById(routineId);
+    public ResponseEntity<Routine> getRoutineById(@PathVariable String routineId) throws ExecutionException, InterruptedException {
+        
+        return ResponseEntity.ok(routineService.getRoutineById(routineId)) ;
     }
 }
