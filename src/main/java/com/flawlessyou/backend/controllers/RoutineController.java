@@ -7,12 +7,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-@RestController
+@RestController 
 @RequestMapping("/api/routines")
 public class RoutineController {
 
@@ -25,13 +27,21 @@ public class RoutineController {
         return ResponseEntity.ok(routineService.createRoutine(request, routine)) ;
     }
 
-
-    @GetMapping("/{routineId}")
-    public ResponseEntity<Routine> getRoutineById(@PathVariable String routineId) throws ExecutionException, InterruptedException {
-        
-        return ResponseEntity.ok(routineService.getRoutineById(routineId)) ;
+    @PostMapping("/")
+    public ResponseEntity<?> getRoutineById(@RequestBody Map<String, String> requestBody) {
+        String routineId = requestBody.get("routineId");
+        try {
+            Routine routine = routineService.getRoutineById(routineId);
+            return ResponseEntity.ok(routine);
+        } catch (ExecutionException | InterruptedException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error retrieving routine: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
-
     // @GetMapping("/{analysisId}")
     // public String getAnalysisById(@PathVariable String analysisId) {
     //     try {
@@ -46,4 +56,8 @@ public class RoutineController {
     //         return "Error retrieving analysis: " + e.getMessage();
     //     }
     // }
+    @GetMapping("/userRoutine")
+    public List<Routine> getAllRoutinesForUser(HttpServletRequest request) throws  Exception {
+     return routineService.getAllRoutinesForUser(request);
+    }
 }
