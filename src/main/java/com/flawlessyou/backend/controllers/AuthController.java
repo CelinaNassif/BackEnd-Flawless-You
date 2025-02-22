@@ -54,7 +54,7 @@ public class AuthController {
 
     @Autowired
     private JwtUtils jwtUtils;
-
+    @Autowired
    public GetUser getUser;
    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
   
@@ -210,8 +210,8 @@ public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String>
 }
     @PutMapping("/changePassword")
     public ResponseEntity<?> changePassword(@RequestBody Map<String, String> passwords,
-                                          HttpServletRequest request) {
-        try {
+                                          HttpServletRequest request) throws Exception {
+       
             String oldPassword = passwords.get("oldPassword");
             String newPassword = passwords.get("newPassword");
             
@@ -220,12 +220,8 @@ public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String>
                     .body(new MessageResponse("Both old and new passwords are required"));
             }
 
-            String jwt = getUser.parseJwt(request);
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                String username = jwtUtils.getUserNameFromJwtToken(jwt);
-                User user = userService.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
+          
+            User user = getUser.userFromToken(request);
                 if (!encoder.matches(oldPassword, user.getHashedPassword())) {
                     return ResponseEntity.badRequest()
                         .body(new MessageResponse("Current password is incorrect"));
@@ -234,15 +230,7 @@ public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String>
                 user.setHashedPassword(encoder.encode(newPassword));
                 userService.saveUser(user);
                 return ResponseEntity.ok(new MessageResponse("Password changed successfully"));
-            }
-            
-            return ResponseEntity.badRequest()
-                .body(new MessageResponse("Invalid or expired token"));
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new MessageResponse("Error changing password: " + e.getMessage()));
-        }
+    
     }
 
 }
