@@ -73,10 +73,48 @@ public class RoutineService {
         DocumentSnapshot document = future.get();
     
         if (document.exists()) {
-            return document.toObject(Routine.class); // Return the Routine object directly
+            return document.toObject(Routine.class);
         } else {
             // logger.error("Routine not found with ID: " + routineId);
             throw new RuntimeException("Routine not found with ID: " + routineId);
         }
+    }
+
+
+public List<Routine> getAllRoutinesForUser(HttpServletRequest request) throws Exception {
+    List<Routine> routines = new ArrayList<>();
+
+    CollectionReference routinesRef = firestore.collection("routines");
+    Query query = routinesRef.whereEqualTo("userId", getUser.userFromToken(request).getUserId()); 
+    ApiFuture<QuerySnapshot> querySnapshot = query.get();
+
+    for (DocumentSnapshot document : querySnapshot.get().getDocuments()) {
+        routines.add(document.toObject(Routine.class));
+    }
+
+    return routines;
+}
+    // public String getAnalysisById(String analysisId) throws ExecutionException, InterruptedException {
+    //     DocumentReference docRef = firestore.collection("analyses").document(analysisId);
+    //     ApiFuture<DocumentSnapshot> future = docRef.get();
+    //     DocumentSnapshot document = future.get();
+    //     if (document.exists()) {
+    //         return document.getString("analysisData"); // افتراض أن التحليل مخزن كحقل "analysisData"
+    //     }
+    //     return null;
+    // }
+
+    public Routine getLastRoutineForUser(String userId) throws ExecutionException, InterruptedException {
+        DocumentReference userRef = firestore.collection("users").document(userId);
+        ApiFuture<DocumentSnapshot> userFuture = userRef.get();
+        DocumentSnapshot userDocument = userFuture.get();
+        if (userDocument.exists()) {
+            User user = userDocument.toObject(User.class);
+            if (user != null && user.getRoutineId() != null && !user.getRoutineId().isEmpty()) {
+                String lastRoutineId = user.getRoutineId().get(user.getRoutineId().size() - 1);
+                return getRoutineById(lastRoutineId);
+            }
+        }
+        return null;
     }
 }

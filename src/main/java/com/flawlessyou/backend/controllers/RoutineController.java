@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -55,4 +56,8 @@ public class RoutineController {
     //         return "Error retrieving analysis: " + e.getMessage();
     //     }
     // }
+    @GetMapping("/userRoutine")
+    public List<Routine> getAllRoutinesForUser(HttpServletRequest request) throws  Exception {
+     return routineService.getAllRoutinesForUser(request);
+    }
 }
