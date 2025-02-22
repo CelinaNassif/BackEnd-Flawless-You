@@ -32,5 +32,18 @@ public class RoutineController {
         return ResponseEntity.ok(routineService.getRoutineById(routineId)) ;
     }
 
-    
+    // @GetMapping("/{analysisId}")
+    // public String getAnalysisById(@PathVariable String analysisId) {
+    //     try {
+    //         String analysisData = routineService.getAnalysisById(analysisId);
+    //         if (analysisData != null) {
+    //             return analysisData;
+    //         } else {
+    //             return "Analysis not found";
+    //         }
+    //     } catch (ExecutionException | InterruptedException e) {
+    //         e.printStackTrace();
+    //         return "Error retrieving analysis: " + e.getMessage();
+    //     }
+    // }
 }
