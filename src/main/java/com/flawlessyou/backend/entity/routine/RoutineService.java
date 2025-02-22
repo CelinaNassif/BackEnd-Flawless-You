@@ -74,5 +74,18 @@ public class RoutineService {
 //         return null;
 // }
 
+public Routine getLastRoutineForUser(String userId) throws ExecutionException, InterruptedException {
+    DocumentReference userRef = firestore.collection("users").document(userId);
+    ApiFuture<DocumentSnapshot> userFuture = userRef.get();
+    DocumentSnapshot userDocument = userFuture.get();
+    if (userDocument.exists()) {
+        User user = userDocument.toObject(User.class);
+        if (user != null && user.getRoutineId() != null && !user.getRoutineId().isEmpty()) {
+            String lastRoutineId = user.getRoutineId().get(user.getRoutineId().size() - 1);
+            return getRoutineById(lastRoutineId);
+        }
+    }
+    return null;
+}
 
 }
