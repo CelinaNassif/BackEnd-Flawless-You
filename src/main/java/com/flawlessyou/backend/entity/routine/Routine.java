@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import java.sql.Timestamp;
 import java.util.Map;
-@Data
 
 
 public class Routine {
@@ -30,5 +29,56 @@ public class Routine {
         this.description = description;
         this.analysisId = analysisId;
     }
+    
+  public Routine() {
+    }
 
+// Getters and setters (required for Firestore serialization/deserialization)
+  public String getRoutineId() {
+    return routineId;
+}
+
+public void setRoutineId(String routineId) {
+    this.routineId = routineId;
+}
+
+public String getUserId() {
+    return userId;
+}
+
+public void setUserId(String userId) {
+    this.userId = userId;
+}
+
+public Map<String, Timestamp> getProductIds() {
+    return productIds;
+}
+
+public void setProductIds(Map<String, Timestamp> productIds) {
+    this.productIds = productIds;
+}
+
+public Timestamp getTimeAnalysis() {
+    return timeAnalysis;
+}
+
+public void setTimeAnalysis(Timestamp timeAnalysis) {
+    this.timeAnalysis = timeAnalysis;
+}
+
+public String getDescription() {
+    return description;
+}
+
+public void setDescription(String description) {
+    this.description = description;
+}
+
+public String getAnalysisId() {
+    return analysisId;
+}
+
+public void setAnalysisId(String analysisId) {
+    this.analysisId = analysisId;
+}
 }
