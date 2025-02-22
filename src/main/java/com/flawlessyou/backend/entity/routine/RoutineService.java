@@ -62,4 +62,17 @@ public class RoutineService {
         }
         return null;
     }
+
+
+//     public String getAnalysisById(String analysisId) throws ExecutionException, InterruptedException {
+//         DocumentReference docRef = firestore.collection("analyses").document(analysisId);
+//         ApiFuture<DocumentSnapshot> future = docRef.get();
+//         DocumentSnapshot document = future.get();
+//         if (document.exists()) {
+//             return document.getString("analysisData"); // افتراض أن التحليل مخزن كحقل "analysisData"
+//         }
+//         return null;
+// }
+
+
 }

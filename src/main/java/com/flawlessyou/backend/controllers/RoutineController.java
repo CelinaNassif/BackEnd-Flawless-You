@@ -31,4 +31,6 @@ public class RoutineController {
         
         return ResponseEntity.ok(routineService.getRoutineById(routineId)) ;
     }
+
+    
 }
