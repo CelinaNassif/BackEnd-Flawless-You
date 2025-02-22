@@ -3,7 +3,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -16,12 +15,12 @@ public class Routine {
     private String routineId;
 
     private String userId;
-    private Map<String, String> productIds;
-    private Timestamp timeAnalysis;
+    private List<String> productIds;
+    private String timeAnalysis;
     private String description;
     private String analysisId;
 
-    public Routine( Map<String, String> productIds, Timestamp timeAnalysis, String description,
+    public Routine( List<String> productIds, String timeAnalysis, String description,
             String analysisId) {
         this.routineId = UUID.randomUUID().toString();
         this.productIds = productIds;
@@ -51,19 +50,19 @@ public void setUserId(String userId) {
     this.userId = userId;
 }
 
-public Map<String, String> getProductIds() {
+public List<String> getProductIds() {
     return productIds;
 }
 
-public void setProductIds(Map<String, String> productIds) {
+public void setProductIds(List<String> productIds ) {
     this.productIds = productIds;
 }
 
-public Timestamp getTimeAnalysis() {
+public String getTimeAnalysis() {
     return timeAnalysis;
 }
 
-public void setTimeAnalysis(Timestamp timeAnalysis) {
+public void setTimeAnalysis(String timeAnalysis) {
     this.timeAnalysis = timeAnalysis;
 }
 

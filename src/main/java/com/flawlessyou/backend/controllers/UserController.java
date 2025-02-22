@@ -13,7 +13,7 @@ import com.flawlessyou.backend.entity.user.User;
 import com.flawlessyou.backend.entity.user.UserService;
 import com.flawlessyou.backend.util.FileUploadUtil;
 import com.flawlessyou.backend.entity.user.Gender;
-import com.flawlessyou.backend.entity.user.Role;
+import com.flawlessyou.backend.entity.user.Role; 
 
 import jakarta.servlet.http.HttpServletRequest;
 
