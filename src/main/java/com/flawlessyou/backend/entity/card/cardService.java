@@ -28,7 +28,7 @@ private GetUser getUser;
         card.setSentDate(new Date());
         User user = getUser.userFromToken(request);
         card.setSenderId(user.getUserId());
-
+      
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection(COLLECTION_NAME).document(card.getId()).set(card);
         return collectionsApiFuture.get().getUpdateTime().toString();
     }

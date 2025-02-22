@@ -26,7 +26,7 @@ public class CardController {
     public String sendCard(@RequestParam String message, HttpServletRequest request, @RequestParam String name) throws Exception {
        Card card = new Card();
        card.setMessage(message);
-       
+       card.setExpertName(name);
        card.setExpertId(userService.findByUsername(name).get().getUserId());
         return cardService.sendCard(card, request);
     }

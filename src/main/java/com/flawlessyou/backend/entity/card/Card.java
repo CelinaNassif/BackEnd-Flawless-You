@@ -12,7 +12,7 @@ public class Card {
     private Date sentDate; 
     private String expertReply; 
     private Date replyDate;
-
+    private String expertName; 
     
     
 
@@ -73,6 +73,26 @@ public class Card {
     }
     public void setReplyDate(Date replyDate) {
         this.replyDate = replyDate;
+    }
+
+
+
+
+
+
+
+    public String getExpertName() {
+        return expertName;
+    }
+
+
+
+
+
+
+
+    public void setExpertName(String expertName) {
+        this.expertName = expertName;
     } 
 
 
