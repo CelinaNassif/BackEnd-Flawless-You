@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/routines")
@@ -21,5 +22,11 @@ public class RoutineController {
     public Routine createRoutine(HttpServletRequest request,
                                  @RequestBody Routine routine) throws Exception {
         return routineService.createRoutine(request, routine);
+    }
+
+
+    @GetMapping("/{routineId}")
+    public Routine getRoutineById(@PathVariable String routineId) throws ExecutionException, InterruptedException {
+        return routineService.getRoutineById(routineId);
     }
 }
