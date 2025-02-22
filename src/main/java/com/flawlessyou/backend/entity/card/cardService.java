@@ -28,7 +28,7 @@ private GetUser getUser;
         card.setSentDate(new Date());
         User user = getUser.userFromToken(request);
         card.setSenderId(user.getUserId());
-
+      
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection(COLLECTION_NAME).document(card.getId()).set(card);
         return collectionsApiFuture.get().getUpdateTime().toString();
     }
@@ -55,10 +55,11 @@ private GetUser getUser;
     }
 
     // استرجاع جميع البطاقات المرسلة إلى خبير معين
-    public List<Card> getCardsByExpertId(String expertId) throws ExecutionException, InterruptedException {
+    public List<Card> getCardsByExpertId(HttpServletRequest request) throws Exception {
+       
         Firestore dbFirestore = FirestoreClient.getFirestore();
         CollectionReference cardsCollection = dbFirestore.collection(COLLECTION_NAME);
-        Query query = cardsCollection.whereEqualTo("expertId", expertId);
+        Query query = cardsCollection.whereEqualTo("expertId", getUser.userFromToken(request).getUserId());
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
 
         List<Card> cards = new ArrayList<>();
@@ -71,10 +72,11 @@ private GetUser getUser;
 
 
      // استرجاع جميع البطاقات المرسلة إلى خبير معين
-     public List<Card> getCardsByUserId(String userId) throws ExecutionException, InterruptedException {
+     public List<Card> getCardsByUserId(HttpServletRequest request) throws Exception {
+        
         Firestore dbFirestore = FirestoreClient.getFirestore();
         CollectionReference cardsCollection = dbFirestore.collection(COLLECTION_NAME);
-        Query query = cardsCollection.whereEqualTo("senderId", userId);
+        Query query = cardsCollection.whereEqualTo("senderId", getUser.userFromToken(request).getUserId());
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
 
         List<Card> cards = new ArrayList<>();

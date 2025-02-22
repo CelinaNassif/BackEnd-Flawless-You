@@ -3,6 +3,8 @@ package com.flawlessyou.backend.controllers;
 
 import com.flawlessyou.backend.entity.card.Card;
 import com.flawlessyou.backend.entity.card.cardService;
+import com.flawlessyou.backend.entity.user.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,10 +20,18 @@ public class CardController {
     private cardService cardService;
 
     // إرسال بطاقة من المستخدم العادي إلى خبير البشرة
+    @Autowired
+    private UserService userService;
     @PostMapping("/send")
-    public String sendCard(@RequestBody Card card, HttpServletRequest request) throws Exception {
+    public String sendCard(@RequestParam String message, HttpServletRequest request, @RequestParam String name) throws Exception {
+       Card card = new Card();
+       card.setMessage(message);
+       card.setExpertName(name);
+       card.setExpertId(userService.findByUsername(name).get().getUserId());
         return cardService.sendCard(card, request);
     }
+
+
 
     // استرجاع بطاقة بواسطة معرفها
     @GetMapping("/{id}")
@@ -36,14 +46,15 @@ public class CardController {
     }
 
     // استرجاع جميع البطاقات المرسلة إلى خبير معين
-    @GetMapping("/expert/{expertId}")
-    public List<Card> getCardsByExpertId(@PathVariable String expertId) throws ExecutionException, InterruptedException {
-        return cardService.getCardsByExpertId(expertId);
+    @GetMapping("/expert")
+    public List<Card> getCardsByExpertId(HttpServletRequest request) throws Exception {
+        return cardService.getCardsByExpertId(request);
     }
 
     // استرجاع جميع البطاقات المرسلة من مستخدم معين
-    @GetMapping("/user/{userId}")
-    public List<Card> getCardsByUserId(@PathVariable String userId) throws ExecutionException, InterruptedException {
-        return cardService.getCardsByUserId(userId);
+    @GetMapping("/user")
+    public List<Card> getCardsByUserId(HttpServletRequest request) throws Exception {
+     
+        return cardService.getCardsByUserId(request);
     }
 }

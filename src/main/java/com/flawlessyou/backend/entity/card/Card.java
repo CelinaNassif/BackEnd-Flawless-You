@@ -12,16 +12,26 @@ public class Card {
     private Date sentDate; 
     private String expertReply; 
     private Date replyDate;
-
+    private String expertName; 
     
     
 
-    public Card( String expertId, String message) {
-       this.id = UUID.randomUUID().toString(); // توليد معرف فريد
-        this.expertId = expertId;
-        this.message = message;
-        
+    public Card() {
+        this.id = UUID.randomUUID().toString(); // توليد معرف فريد
     }
+
+
+
+
+
+
+    
+    // public Card( String expertId, String message) {
+    //    this.id = UUID.randomUUID().toString(); // توليد معرف فريد
+    //     this.expertId = expertId;
+    //     this.message = message;
+        
+    // }
     public String getId() {
         return id;
     }
@@ -63,6 +73,26 @@ public class Card {
     }
     public void setReplyDate(Date replyDate) {
         this.replyDate = replyDate;
+    }
+
+
+
+
+
+
+
+    public String getExpertName() {
+        return expertName;
+    }
+
+
+
+
+
+
+
+    public void setExpertName(String expertName) {
+        this.expertName = expertName;
     } 
 
 
