@@ -108,11 +108,29 @@ public List<User> getUsersByRole(Role role) throws ExecutionException, Interrupt
 
 
 
+public List<User> getUsersByUsername(String searchText) throws ExecutionException, InterruptedException {
+    Query query = firestore.collection(COLLECTION_NAME)
+            .whereGreaterThanOrEqualTo("userName", searchText)
+            .whereLessThanOrEqualTo("userName", searchText + "\uf8ff");
+    
+    QuerySnapshot querySnapshot = query.get().get();
+    
+    return querySnapshot.getDocuments().stream()
+            .map(document -> document.toObject(User.class))
+            .collect(Collectors.toList());
+}
 
 
 
+public void updateUserRole(String userId, Role newRole) throws ExecutionException, InterruptedException {
+    if (userId == null || userId.isEmpty() || newRole == null) {
+        throw new IllegalArgumentException("User ID and Role must not be null or empty.");
+    }
 
+    DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(userId);
 
+    docRef.update("role", newRole).get();
+}
 
 
 
