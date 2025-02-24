@@ -4,7 +4,9 @@ import com.google.cloud.firestore.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -108,7 +110,7 @@ public List<User> getUsersByRole(Role role) throws ExecutionException, Interrupt
 
 
 
-public List<User> getUsersByUsername(String searchText) throws ExecutionException, InterruptedException {
+public List<Map<String, String>> getUsersByUsername(String searchText) throws ExecutionException, InterruptedException {
     Query query = firestore.collection(COLLECTION_NAME)
             .whereGreaterThanOrEqualTo("userName", searchText)
             .whereLessThanOrEqualTo("userName", searchText + "\uf8ff");
@@ -116,10 +118,14 @@ public List<User> getUsersByUsername(String searchText) throws ExecutionExceptio
     QuerySnapshot querySnapshot = query.get().get();
     
     return querySnapshot.getDocuments().stream()
-            .map(document -> document.toObject(User.class))
+            .map(document -> {
+                Map<String, String> userInfo = new HashMap<>();
+                userInfo.put("id", document.getId());
+                userInfo.put("userName", document.getString("userName"));
+                return userInfo;
+            })
             .collect(Collectors.toList());
 }
-
 
 
 public void updateUserRole(String userId, Role newRole) throws ExecutionException, InterruptedException {

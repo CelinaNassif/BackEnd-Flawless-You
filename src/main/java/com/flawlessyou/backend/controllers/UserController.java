@@ -183,7 +183,7 @@ public class UserController {
     }
 
     @GetMapping("/Search/username")
-    public List<User> findByUsername(@RequestParam String username) throws ExecutionException, InterruptedException {
+    public List<Map<String, String>> findByUsername(@RequestParam String username) throws ExecutionException, InterruptedException {
         return userService.getUsersByUsername(username);
     }
 
