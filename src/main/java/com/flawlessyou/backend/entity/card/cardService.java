@@ -46,13 +46,32 @@ private GetUser getUser;
         return card;
     }
 
-    // إضافة رد خبير البشرة على البطاقة
-    public String addExpertReply(String id, String expertReply) throws ExecutionException, InterruptedException {
-        Firestore dbFirestore = FirestoreClient.getFirestore();
-        DocumentReference documentReference = dbFirestore.collection(COLLECTION_NAME).document(id);
-        ApiFuture<WriteResult> future = documentReference.update("expertReply", expertReply, "replyDate", new Date());
-        return future.get().getUpdateTime().toString();
-    }
+    // public String addExpertReply(String id, String expertReply) throws ExecutionException, InterruptedException {
+    //     Firestore dbFirestore = FirestoreClient.getFirestore();
+    //     DocumentReference documentReference = dbFirestore.collection(COLLECTION_NAME).document(id);
+
+    //     // استرجاع القائمة الحالية
+    //     ApiFuture<Card> future = documentReference.get().thenApply(documentSnapshot -> {
+    //         Card card = documentSnapshot.toObject(Card.class);
+    //         if (card != null) {
+    //             List<String> replies = card.getExpertReply();
+    //             if (replies == null) {
+    //                 replies = new ArrayList<>();
+    //             }
+    //             replies.add(expertReply); // إضافة الرد الجديد
+    //             card.setExpertReply(replies);
+    //             card.setReplyDate(new Date()); // تحديث تاريخ الرد
+    //         }
+    //         return card;
+    //     });
+
+    //     // تحديث المستند بالقائمة الجديدة
+    //     Card updatedCard = future.get();
+    //     ApiFuture<WriteResult> updateFuture = documentReference.set(updatedCard);
+
+    //     return updateFuture.get().getUpdateTime().toString();
+    // }
+
 
     // استرجاع جميع البطاقات المرسلة إلى خبير معين
     public List<Card> getCardsByExpertId(HttpServletRequest request) throws Exception {

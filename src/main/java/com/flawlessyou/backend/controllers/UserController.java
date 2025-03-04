@@ -182,6 +182,23 @@ public class UserController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/Search/username")
+    public List<Map<String, String>> findByUsername(@RequestParam String username) throws ExecutionException, InterruptedException {
+        return userService.getUsersByUsername(username);
+    }
 
 
+    @PutMapping("/{userId}/role")
+    public ResponseEntity<?> updateUserRole(
+            @PathVariable String userId,
+            @RequestParam Role newRole) {
+        try {
+           userService.updateUserRole(userId, newRole);
+            return ResponseEntity.ok("ok");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (ExecutionException | InterruptedException e) {
+            return ResponseEntity.status(500).body("Internal server error: " + e.getMessage());
+        }
+    }
 }

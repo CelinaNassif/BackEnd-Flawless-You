@@ -134,6 +134,8 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             .requestMatchers(HttpMethod.DELETE, "/product/{productId}").hasRole("ADMIN")
             .requestMatchers(HttpMethod.POST, "/cards/{id}/reply").hasRole("SKIN_EXPERT")
             .requestMatchers(HttpMethod.PUT, "/product/product").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.PUT, "/api/users/{userId}/role").hasRole("ADMIN")
+
                                       .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/oauth2/callback/**").permitAll()
                 .anyRequest().authenticated()

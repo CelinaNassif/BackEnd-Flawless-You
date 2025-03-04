@@ -1,6 +1,7 @@
 package com.flawlessyou.backend.entity.card;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class Card {
@@ -10,11 +11,31 @@ public class Card {
     private String expertId; 
     private String message; 
     private Date sentDate; 
-    private String expertReply; 
+    private List<String> expertReply; 
     private Date replyDate;
     private String expertName; 
-    
-    
+    private boolean isEdit;
+    private String skinAnalysiId;
+
+    public String getSkinAnalysiId() {
+        return skinAnalysiId;
+    }
+
+
+
+
+
+
+
+    public void setSkinAnalysiId(String skinAnalysiId) {
+        this.skinAnalysiId = skinAnalysiId;
+    }
+
+
+
+
+
+
 
     public Card() {
         this.id = UUID.randomUUID().toString(); // توليد معرف فريد
@@ -62,10 +83,10 @@ public class Card {
     public void setSentDate(Date sentDate) {
         this.sentDate = sentDate;
     }
-    public String getExpertReply() {
+    public List<String> getExpertReply() {
         return expertReply;
     }
-    public void setExpertReply(String expertReply) {
+    public void setExpertReply(List<String> expertReply) {
         this.expertReply = expertReply;
     }
     public Date getReplyDate() {
@@ -93,6 +114,26 @@ public class Card {
 
     public void setExpertName(String expertName) {
         this.expertName = expertName;
+    }
+
+
+
+
+
+
+
+    public boolean isEdit() {
+        return isEdit;
+    }
+
+
+
+
+
+
+
+    public void setEdit(boolean isEdit) {
+        this.isEdit = isEdit;
     } 
 
 
