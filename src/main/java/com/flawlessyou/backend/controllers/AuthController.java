@@ -194,14 +194,16 @@ public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String>
         String jwt = jwtUtils.generateJwtToken(authentication);
         
         System.out.println("Generated JWT token for Google login: " + jwt);
+        List<String> roles = userDetails.getAuthorities().stream()
+        .map(item -> item.getAuthority())
+        .collect(Collectors.toList());
 
         return ResponseEntity.ok(new JwtResponse(
             jwt,
             user.getUserId(),
             user.getUserName(),
             user.getEmail(),  
-            Collections.singletonList(user.getRole().name())
-        ));
+            roles        ));
 
     } catch (Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
