@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.flawlessyou.backend.config.GetUser;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteResult;
 
@@ -32,4 +33,15 @@ public class treatmentService {
         return future.get().getUpdateTime().toString();
     }
 
+        // قراءة علاج معين بواسطة الـ ID
+    public treatment getTreatment(String treatmentId) throws ExecutionException, InterruptedException {
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(treatmentId);
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+        DocumentSnapshot document = future.get();
+        if (document.exists()) {
+            return document.toObject(treatment.class);
+        } else {
+            return null;
+        }
+    }
 }
