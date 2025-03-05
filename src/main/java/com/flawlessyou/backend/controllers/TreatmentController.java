@@ -60,4 +60,14 @@ public List<Product> getProductsForTreatment(@PathVariable String treatmentId) t
     return treatmentService.getProductsForTreatment(treatmentId);
 }
 
+@PostMapping("/{treatmentId}/products/{productId}")
+public String addProductToTreatment(@PathVariable String treatmentId, @PathVariable String productId) throws ExecutionException, InterruptedException {
+    return treatmentService.addProductToTreatment(treatmentId, productId);
+}
+
+@DeleteMapping("/{treatmentId}/products/{productId}")
+public String removeProductFromTreatment(@PathVariable String treatmentId, @PathVariable String productId) throws ExecutionException, InterruptedException {
+    return treatmentService.removeProductFromTreatment(treatmentId, productId);
+}
+
 }

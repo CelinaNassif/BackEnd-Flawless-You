@@ -142,4 +142,41 @@ public class treatmentService {
     return products;
 }
 
+
+public String addProductToTreatment(String treatmentId, String productId) throws ExecutionException, InterruptedException {
+    treatment treatment = getTreatment(treatmentId);
+    if (treatment == null) {
+        throw new RuntimeException("Treatment not found with ID: " + treatmentId);
+    }
+
+    List<String> productIds = treatment.getProductIds();
+    if (productIds == null) {
+        productIds = new ArrayList<>();
+    }
+
+    if (!productIds.contains(productId)) {
+        productIds.add(productId);
+        treatment.setProductIds(productIds);
+    }
+
+    ApiFuture<WriteResult> future = firestore.collection(COLLECTION_NAME).document(treatmentId).set(treatment);
+    return future.get().getUpdateTime().toString();
+}
+
+public String removeProductFromTreatment(String treatmentId, String productId) throws ExecutionException, InterruptedException {
+    treatment treatment = getTreatment(treatmentId);
+    if (treatment == null) {
+        throw new RuntimeException("Treatment not found with ID: " + treatmentId);
+    }
+
+    List<String> productIds = treatment.getProductIds();
+    if (productIds != null && productIds.contains(productId)) {
+        productIds.remove(productId);
+        treatment.setProductIds(productIds);
+    }
+
+    ApiFuture<WriteResult> future = firestore.collection(COLLECTION_NAME).document(treatmentId).set(treatment);
+    return future.get().getUpdateTime().toString();
+}
+
 }
