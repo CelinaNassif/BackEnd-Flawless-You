@@ -79,4 +79,11 @@ public class treatmentService {
             ApiFuture<WriteResult> updateFuture = docRef.set(existingTreatment);
             return updateFuture.get().getUpdateTime().toString();
         }
+
+
+
+        public String deleteTreatment(String treatmentId) throws ExecutionException, InterruptedException {
+            ApiFuture<WriteResult> future = firestore.collection(COLLECTION_NAME).document(treatmentId).delete();
+            return future.get().getUpdateTime().toString();
+        }
 }
