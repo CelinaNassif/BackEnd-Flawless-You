@@ -102,4 +102,15 @@ public class treatmentService {
         return treatments;
     }
 
+       // جلب العلاجات حسب نوع البشرة
+       public List<treatment> getTreatmentsBySkinType(String skinType) throws ExecutionException, InterruptedException {
+        List<treatment> treatments = new ArrayList<>();
+        ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION_NAME).whereEqualTo("skinType", skinType).get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        for (QueryDocumentSnapshot document : documents) {
+            treatments.add(document.toObject(treatment.class));
+        }
+        return treatments;
+    }
+
 }
