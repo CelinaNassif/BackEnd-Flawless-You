@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,5 +29,10 @@ public class TreatmentController {
      @GetMapping("/{treatmentId}")
     public treatment getTreatment(@PathVariable String treatmentId) throws ExecutionException, InterruptedException {
         return treatmentService.getTreatment(treatmentId);
+    }
+
+     @PutMapping
+    public String updateTreatment(@RequestBody treatment treatment) throws ExecutionException, InterruptedException {
+        return treatmentService.updateTreatment(treatment);
     }
 }
