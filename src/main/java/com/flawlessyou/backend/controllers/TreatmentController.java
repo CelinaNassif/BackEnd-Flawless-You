@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.flawlessyou.backend.entity.product.Product;
 import com.flawlessyou.backend.entity.treatments.treatment;
 import com.flawlessyou.backend.entity.treatments.treatmentService;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,4 +54,10 @@ public class TreatmentController {
     public List<treatment> getTreatmentsBySkinType(@PathVariable String skinType) throws ExecutionException, InterruptedException {
         return treatmentService.getTreatmentsBySkinType(skinType);
     }
+    
+    @GetMapping("/{treatmentId}/products")
+public List<Product> getProductsForTreatment(@PathVariable String treatmentId) throws ExecutionException, InterruptedException {
+    return treatmentService.getProductsForTreatment(treatmentId);
+}
+
 }
