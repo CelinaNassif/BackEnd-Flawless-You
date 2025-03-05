@@ -40,10 +40,10 @@ public class CardController {
     }
 
     // إضافة رد خبير البشرة على البطاقة
-    // @PostMapping("/{id}/reply")
-    // public String addExpertReply(@PathVariable String id, @RequestParam String expertReply) throws ExecutionException, InterruptedException {
-    //     return cardService.addExpertReply(id, expertReply);
-    // }
+    @PostMapping("/{id}/reply")
+    public String addExpertReply(@PathVariable String id, @RequestBody String expertReply) throws ExecutionException, InterruptedException {
+        return cardService.addExpertReply(id, expertReply);
+    }
 
     // استرجاع جميع البطاقات المرسلة إلى خبير معين
     @GetMapping("/expert")
