@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.flawlessyou.backend.config.GetUser;
+import com.flawlessyou.backend.entity.product.Product;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -112,5 +113,70 @@ public class treatmentService {
         }
         return treatments;
     }
+
+    public List<Product> getProductsForTreatment(String treatmentId) throws ExecutionException, InterruptedException {
+    // 1. الحصول على العلاج بواسطة الـ treatmentId
+    treatment treatment = getTreatment(treatmentId);
+    if (treatment == null) {
+        throw new RuntimeException("Treatment not found with ID: " + treatmentId);
+    }
+
+    // 2. الحصول على قائمة productIds من العلاج
+    List<String> productIds = treatment.getProductIds();
+    if (productIds == null || productIds.isEmpty()) {
+        return new ArrayList<>(); // إرجاع قائمة فارغة إذا لم يكن هناك منتجات
+    }
+
+    // 3. جلب المنتجات من Firestore بناءً على productIds
+    List<Product> products = new ArrayList<>();
+    for (String productId : productIds) {
+        DocumentReference docRef = firestore.collection("products").document(productId);
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+        DocumentSnapshot document = future.get();
+
+        if (document.exists()) {
+            products.add(document.toObject(Product.class));
+        }
+    }
+
+    return products;
+}
+
+
+public String addProductToTreatment(String treatmentId, String productId) throws ExecutionException, InterruptedException {
+    treatment treatment = getTreatment(treatmentId);
+    if (treatment == null) {
+        throw new RuntimeException("Treatment not found with ID: " + treatmentId);
+    }
+
+    List<String> productIds = treatment.getProductIds();
+    if (productIds == null) {
+        productIds = new ArrayList<>();
+    }
+
+    if (!productIds.contains(productId)) {
+        productIds.add(productId);
+        treatment.setProductIds(productIds);
+    }
+
+    ApiFuture<WriteResult> future = firestore.collection(COLLECTION_NAME).document(treatmentId).set(treatment);
+    return future.get().getUpdateTime().toString();
+}
+
+public String removeProductFromTreatment(String treatmentId, String productId) throws ExecutionException, InterruptedException {
+    treatment treatment = getTreatment(treatmentId);
+    if (treatment == null) {
+        throw new RuntimeException("Treatment not found with ID: " + treatmentId);
+    }
+
+    List<String> productIds = treatment.getProductIds();
+    if (productIds != null && productIds.contains(productId)) {
+        productIds.remove(productId);
+        treatment.setProductIds(productIds);
+    }
+
+    ApiFuture<WriteResult> future = firestore.collection(COLLECTION_NAME).document(treatmentId).set(treatment);
+    return future.get().getUpdateTime().toString();
+}
 
 }
