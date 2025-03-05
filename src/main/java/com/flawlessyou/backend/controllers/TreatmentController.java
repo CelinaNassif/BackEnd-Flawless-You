@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.flawlessyou.backend.entity.treatments.treatment;
 import com.flawlessyou.backend.entity.treatments.treatmentService;
-
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
+// import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
 @RequestMapping("/api/treatments")

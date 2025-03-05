@@ -1,35 +1,43 @@
 package com.flawlessyou.backend.entity.treatments;
 
 import java.util.List;
+import java.util.UUID;
+
+import com.flawlessyou.backend.entity.product.Type;
 
 public class treatment {
 
     private String treatmentId;
-    private String skinType;
+    private Type skinType;
     private String problem;
     private List<String> productIds;
 
-    
-    public treatment() {
-    }
 
-    
-    public treatment(String treatmentId, String skinType, String problem, List<String> productIds) {
-        this.treatmentId = treatmentId;
+
+    public treatment( Type skinType, String problem, List<String> productIds) {
+        this.treatmentId = UUID.randomUUID().toString();
         this.skinType = skinType;
         this.problem = problem;
         this.productIds = productIds;
     }
+
+    
+    
+    public treatment() {
+        this.treatmentId = UUID.randomUUID().toString();
+    }
+
+    
     public String getTreatmentId() {
         return treatmentId;
     }
     public void setTreatmentId(String treatmentId) {
         this.treatmentId = treatmentId;
     }
-    public String getSkinType() {
+    public Type getSkinType() {
         return skinType;
     }
-    public void setSkinType(String skinType) {
+    public void setSkinType(Type skinType) {
         this.skinType = skinType;
     }
     public String getProblem() {
