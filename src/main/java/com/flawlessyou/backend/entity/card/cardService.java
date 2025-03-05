@@ -46,31 +46,35 @@ private GetUser getUser;
         return card;
     }
 
-    // public String addExpertReply(String id, String expertReply) throws ExecutionException, InterruptedException {
-    //     Firestore dbFirestore = FirestoreClient.getFirestore();
-    //     DocumentReference documentReference = dbFirestore.collection(COLLECTION_NAME).document(id);
-
-    //     // استرجاع القائمة الحالية
-    //     ApiFuture<Card> future = documentReference.get().thenApply(documentSnapshot -> {
-    //         Card card = documentSnapshot.toObject(Card.class);
-    //         if (card != null) {
-    //             List<String> replies = card.getExpertReply();
-    //             if (replies == null) {
-    //                 replies = new ArrayList<>();
-    //             }
-    //             replies.add(expertReply); // إضافة الرد الجديد
-    //             card.setExpertReply(replies);
-    //             card.setReplyDate(new Date()); // تحديث تاريخ الرد
-    //         }
-    //         return card;
-    //     });
-
-    //     // تحديث المستند بالقائمة الجديدة
-    //     Card updatedCard = future.get();
-    //     ApiFuture<WriteResult> updateFuture = documentReference.set(updatedCard);
-
-    //     return updateFuture.get().getUpdateTime().toString();
-    // }
+    public String addExpertReply(String id, String expertReply) throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        DocumentReference documentReference = dbFirestore.collection(COLLECTION_NAME).document(id);
+    
+        // Retrieve the current document
+        ApiFuture<DocumentSnapshot> future = documentReference.get();
+        DocumentSnapshot documentSnapshot = future.get(); // Blocking call to get the document
+    
+        if (documentSnapshot.exists()) {
+            Card card = documentSnapshot.toObject(Card.class);
+            if (card != null) {
+                List<String> replies = card.getExpertReply();
+                if (replies == null) {
+                    replies = new ArrayList<>();
+                }
+                replies.add(expertReply); // Add the new reply
+                card.setExpertReply(replies);
+                card.setReplyDate(new Date()); // Update the reply date
+    
+                // Update the document in Firestore
+                ApiFuture<WriteResult> updateFuture = documentReference.set(card);
+                updateFuture.get(); // Blocking call to ensure the update is complete
+                return "Reply added successfully";
+            }
+        } else {
+            return "Document does not exist";
+        }
+        return "Failed to add reply";
+    }
 
 
     // استرجاع جميع البطاقات المرسلة إلى خبير معين
