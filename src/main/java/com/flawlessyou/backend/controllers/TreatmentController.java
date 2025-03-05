@@ -3,6 +3,7 @@ package com.flawlessyou.backend.controllers;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,5 +35,10 @@ public class TreatmentController {
     @PutMapping("/{treatmentId}")
     public String updateTreatment(@PathVariable String treatmentId, @RequestBody treatment updatedTreatment) throws ExecutionException, InterruptedException {
         return treatmentService.updateTreatment(treatmentId, updatedTreatment);
+    }
+
+     @DeleteMapping("/{treatmentId}")
+    public String deleteTreatment(@PathVariable String treatmentId) throws ExecutionException, InterruptedException {
+        return treatmentService.deleteTreatment(treatmentId);
     }
 }
