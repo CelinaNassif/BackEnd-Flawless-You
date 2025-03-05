@@ -48,4 +48,9 @@ public class TreatmentController {
     public List<treatment> getAllTreatments() throws ExecutionException, InterruptedException {
         return treatmentService.getAllTreatments();
     }
+
+    @GetMapping("/skinType/{skinType}")
+    public List<treatment> getTreatmentsBySkinType(@PathVariable String skinType) throws ExecutionException, InterruptedException {
+        return treatmentService.getTreatmentsBySkinType(skinType);
+    }
 }
