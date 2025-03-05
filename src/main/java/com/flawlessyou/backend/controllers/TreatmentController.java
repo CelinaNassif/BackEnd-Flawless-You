@@ -1,5 +1,6 @@
 package com.flawlessyou.backend.controllers;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,5 +41,11 @@ public class TreatmentController {
      @DeleteMapping("/{treatmentId}")
     public String deleteTreatment(@PathVariable String treatmentId) throws ExecutionException, InterruptedException {
         return treatmentService.deleteTreatment(treatmentId);
+    }
+
+
+    @GetMapping
+    public List<treatment> getAllTreatments() throws ExecutionException, InterruptedException {
+        return treatmentService.getAllTreatments();
     }
 }
