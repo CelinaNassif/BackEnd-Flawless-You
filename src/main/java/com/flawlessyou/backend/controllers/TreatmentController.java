@@ -31,8 +31,8 @@ public class TreatmentController {
         return treatmentService.getTreatment(treatmentId);
     }
 
-     @PutMapping
-    public String updateTreatment(@RequestBody treatment treatment) throws ExecutionException, InterruptedException {
-        return treatmentService.updateTreatment(treatment);
+    @PutMapping("/{treatmentId}")
+    public String updateTreatment(@PathVariable String treatmentId, @RequestBody treatment updatedTreatment) throws ExecutionException, InterruptedException {
+        return treatmentService.updateTreatment(treatmentId, updatedTreatment);
     }
 }

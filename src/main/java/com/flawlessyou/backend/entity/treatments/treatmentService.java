@@ -46,8 +46,37 @@ public class treatmentService {
     }
 
         // تعديل علاج موجود
-    public String updateTreatment(treatment treatment) throws ExecutionException, InterruptedException {
-        ApiFuture<WriteResult> future = firestore.collection(COLLECTION_NAME).document(treatment.getTreatmentId()).set(treatment);
-        return future.get().getUpdateTime().toString();
-    }
+        public String updateTreatment(String treatmentId, treatment updatedTreatment) throws ExecutionException, InterruptedException {
+            // 1. التأكد من أن الـ treatmentId غير فارغ
+            if (treatmentId == null || treatmentId.isEmpty()) {
+                throw new IllegalArgumentException("Treatment ID must be a non-empty string.");
+            }
+        
+            // 2. استرجاع العلاج الحالي من Firestore
+            DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(treatmentId);
+            ApiFuture<DocumentSnapshot> future = docRef.get();
+            DocumentSnapshot document = future.get();
+        
+            if (!document.exists()) {
+                throw new RuntimeException("Treatment not found with ID: " + treatmentId);
+            }
+        
+            // 3. تحميل العلاج الحالي
+            treatment existingTreatment = document.toObject(treatment.class);
+        
+            // 4. تحديث الحقول المطلوبة
+            if (updatedTreatment.getSkinType() != null) {
+                existingTreatment.setSkinType(updatedTreatment.getSkinType());
+            }
+            if (updatedTreatment.getProblem() != null) {
+                existingTreatment.setProblem(updatedTreatment.getProblem());
+            }
+            if (updatedTreatment.getProductIds() != null) {
+                existingTreatment.setProductIds(updatedTreatment.getProductIds());
+            }
+        
+            // 5. حفظ العلاج المحدث في Firestore
+            ApiFuture<WriteResult> updateFuture = docRef.set(existingTreatment);
+            return updateFuture.get().getUpdateTime().toString();
+        }
 }
