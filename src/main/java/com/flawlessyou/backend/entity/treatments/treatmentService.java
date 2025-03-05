@@ -44,4 +44,10 @@ public class treatmentService {
             return null;
         }
     }
+
+        // تعديل علاج موجود
+    public String updateTreatment(treatment treatment) throws ExecutionException, InterruptedException {
+        ApiFuture<WriteResult> future = firestore.collection(COLLECTION_NAME).document(treatment.getTreatmentId()).set(treatment);
+        return future.get().getUpdateTime().toString();
+    }
 }
