@@ -1,5 +1,7 @@
 package com.flawlessyou.backend.entity.treatments;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,8 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -81,9 +85,21 @@ public class treatmentService {
         }
 
 
-
+   // حذف علاج بواسطة الـ ID
         public String deleteTreatment(String treatmentId) throws ExecutionException, InterruptedException {
             ApiFuture<WriteResult> future = firestore.collection(COLLECTION_NAME).document(treatmentId).delete();
             return future.get().getUpdateTime().toString();
         }
+
+        // جلب كل العلاجات
+    public List<treatment> getAllTreatments() throws ExecutionException, InterruptedException {
+        List<treatment> treatments = new ArrayList<>();
+        ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION_NAME).get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        for (QueryDocumentSnapshot document : documents) {
+            treatments.add(document.toObject(treatment.class));
+        }
+        return treatments;
+    }
+
 }
