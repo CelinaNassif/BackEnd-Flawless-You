@@ -3,9 +3,10 @@ package com.flawlessyou.backend.entity.SkinAnalysis;
 import java.util.Map;
 import java.util.UUID;
 
-import org.springframework.beans.factory.parsing.Problem;
+
 
 import com.flawlessyou.backend.entity.product.Type;
+import com.flawlessyou.backend.entity.treatments.Problem;
 
 public class SkinAnalysis {
     private String id;

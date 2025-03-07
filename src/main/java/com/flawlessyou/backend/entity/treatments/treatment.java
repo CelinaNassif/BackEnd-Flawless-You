@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.flawlessyou.backend.entity.product.Type;
 
-public class treatment {
+public class Treatment {
 
     private String treatmentId;
     private Type skinType;
@@ -14,7 +14,7 @@ public class treatment {
     private List<String> productIds;
    
    
-    public treatment( Type skinType, String description, List<String> productIds,Problem problem) {
+    public Treatment( Type skinType, String description, List<String> productIds,Problem problem) {
         this.treatmentId = UUID.randomUUID().toString();
         this.skinType = skinType;
         this.description = description;
@@ -24,7 +24,7 @@ public class treatment {
 
     
     
-    public treatment() {
+    public Treatment() {
         this.treatmentId = UUID.randomUUID().toString();
     }
 

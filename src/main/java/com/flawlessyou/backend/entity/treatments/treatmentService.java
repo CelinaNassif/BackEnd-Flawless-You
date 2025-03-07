@@ -20,7 +20,7 @@ import com.google.cloud.firestore.WriteResult;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Service
-public class treatmentService {
+public class TreatmentService {
        @Autowired
     private Firestore firestore;
     
@@ -31,7 +31,7 @@ public class treatmentService {
 
 
     // إنشاء علاج جديد
-    public String createTreatment(treatment treatment) throws ExecutionException, InterruptedException {
+    public String createTreatment(Treatment treatment) throws ExecutionException, InterruptedException {
         DocumentReference addedDocRef = firestore.collection(COLLECTION_NAME).document();
         treatment.setTreatmentId(addedDocRef.getId());
         ApiFuture<WriteResult> future = addedDocRef.set(treatment);
@@ -39,19 +39,19 @@ public class treatmentService {
     }
 
         // قراءة علاج معين بواسطة الـ ID
-    public treatment getTreatment(String treatmentId) throws ExecutionException, InterruptedException {
+    public Treatment getTreatment(String treatmentId) throws ExecutionException, InterruptedException {
         DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(treatmentId);
         ApiFuture<DocumentSnapshot> future = docRef.get();
         DocumentSnapshot document = future.get();
         if (document.exists()) {
-            return document.toObject(treatment.class);
+            return document.toObject(Treatment.class);
         } else {
             return null;
         }
     }
 
         // تعديل علاج موجود
-        public String updateTreatment(String treatmentId, treatment updatedTreatment) throws ExecutionException, InterruptedException {
+        public String updateTreatment(String treatmentId, Treatment updatedTreatment) throws ExecutionException, InterruptedException {
             // 1. التأكد من أن الـ treatmentId غير فارغ
             if (treatmentId == null || treatmentId.isEmpty()) {
                 throw new IllegalArgumentException("Treatment ID must be a non-empty string.");
@@ -67,7 +67,7 @@ public class treatmentService {
             }
         
             // 3. تحميل العلاج الحالي
-            treatment existingTreatment = document.toObject(treatment.class);
+            Treatment existingTreatment = document.toObject(Treatment.class);
         
             // 4. تحديث الحقول المطلوبة
             if (updatedTreatment.getSkinType() != null) {
@@ -93,30 +93,30 @@ public class treatmentService {
         }
 
         // جلب كل العلاجات
-    public List<treatment> getAllTreatments() throws ExecutionException, InterruptedException {
-        List<treatment> treatments = new ArrayList<>();
+    public List<Treatment> getAllTreatments() throws ExecutionException, InterruptedException {
+        List<Treatment> treatments = new ArrayList<>();
         ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION_NAME).get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
         for (QueryDocumentSnapshot document : documents) {
-            treatments.add(document.toObject(treatment.class));
+            treatments.add(document.toObject(Treatment.class));
         }
         return treatments;
     }
 
        // جلب العلاجات حسب نوع البشرة
-       public List<treatment> getTreatmentsBySkinType(String skinType) throws ExecutionException, InterruptedException {
-        List<treatment> treatments = new ArrayList<>();
+       public List<Treatment> getTreatmentsBySkinType(String skinType) throws ExecutionException, InterruptedException {
+        List<Treatment> treatments = new ArrayList<>();
         ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION_NAME).whereEqualTo("skinType", skinType).get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
         for (QueryDocumentSnapshot document : documents) {
-            treatments.add(document.toObject(treatment.class));
+            treatments.add(document.toObject(Treatment.class));
         }
         return treatments;
     }
 
     public List<Product> getProductsForTreatment(String treatmentId) throws ExecutionException, InterruptedException {
     // 1. الحصول على العلاج بواسطة الـ treatmentId
-    treatment treatment = getTreatment(treatmentId);
+    Treatment treatment = getTreatment(treatmentId);
     if (treatment == null) {
         throw new RuntimeException("Treatment not found with ID: " + treatmentId);
     }
@@ -144,7 +144,7 @@ public class treatmentService {
 
 
 public String addProductToTreatment(String treatmentId, String productId) throws ExecutionException, InterruptedException {
-    treatment treatment = getTreatment(treatmentId);
+    Treatment treatment = getTreatment(treatmentId);
     if (treatment == null) {
         throw new RuntimeException("Treatment not found with ID: " + treatmentId);
     }
@@ -164,7 +164,7 @@ public String addProductToTreatment(String treatmentId, String productId) throws
 }
 
 public String removeProductFromTreatment(String treatmentId, String productId) throws ExecutionException, InterruptedException {
-    treatment treatment = getTreatment(treatmentId);
+    Treatment treatment = getTreatment(treatmentId);
     if (treatment == null) {
         throw new RuntimeException("Treatment not found with ID: " + treatmentId);
     }
