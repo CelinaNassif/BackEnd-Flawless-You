@@ -10,6 +10,7 @@ import com.flawlessyou.backend.entity.user.User;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,8 +42,8 @@ public class SkinAnalysisController {
         }
         return skinAnalysisService.getRecommendedTreatments(user.getUserId(), skinType, problems);
     }
-    @PostMapping(value = "/recommen")
-    public List<Treatment> recommendT(
+    @PostMapping( "/skintreatments")
+    public List<Treatment>  skintreatments(
         
             @RequestParam Type skinType
        ) throws Exception {
@@ -51,5 +52,22 @@ public class SkinAnalysisController {
       
         // استدعاء الخدمة للحصول على العلاجات المقترحة
         return skinAnalysisService.getTreatmentsBySkinType(skinType);
+    }
+    @PostMapping(value ="/{id}/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadImageAndUpdateSkinAnalysis(
+            @PathVariable String id,
+            @RequestParam("imageFile") MultipartFile imageFile) {
+        try {
+            // استدعاء الدالة لرفع الصورة وتحديث SkinAnalysis
+            boolean isUpdated = skinAnalysisService.uploadImageAndUpdateSkinAnalysis(id, imageFile);
+
+            if (isUpdated) {
+                return ResponseEntity.ok("Image uploaded and updated successfully!");
+            } else {
+                return ResponseEntity.badRequest().body("Failed to upload image or update SkinAnalysis.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error uploading image: " + e.getMessage());
+        }
     }
 }
