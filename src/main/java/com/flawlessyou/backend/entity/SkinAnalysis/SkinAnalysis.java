@@ -3,16 +3,25 @@ package com.flawlessyou.backend.entity.SkinAnalysis;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.beans.factory.parsing.Problem;
+
 import com.flawlessyou.backend.entity.product.Type;
 
 public class SkinAnalysis {
     private String id;
     private String userId;
     private Type skintype;
-    private Map<String, Double> problem; 
+    private Map<Problem, Double> problems; 
     private String treatmentId;
+    private String imageUrl;
     public String getId() {
         return id;
+    }
+    public String getImageUrl() {
+        return imageUrl;
+    }
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
     public void setId(String id) {
         this.id = id;
@@ -29,11 +38,11 @@ public class SkinAnalysis {
     public void setSkintype(Type skintype) {
         this.skintype = skintype;
     }
-    public Map<String, Double> getProblem() {
-        return problem;
+    public Map<Problem, Double> getProblems() {
+        return problems;
     }
-    public void setProblem(Map<String, Double> problem) {
-        this.problem = problem;
+    public void setProblems(Map<Problem, Double> problems) {
+        this.problems = problems;
     }
     public String getTreatmentId() {
         return treatmentId;
@@ -41,12 +50,13 @@ public class SkinAnalysis {
     public void setTreatmentId(String treatmentId) {
         this.treatmentId = treatmentId;
     }
-    public SkinAnalysis(String userId, Type skintype, Map<String, Double> problem, String treatmentId) {
+    public SkinAnalysis(String userId, Type skintype, Map<Problem, Double> problems,String imageUrl) {
         this.userId = userId;
         this.id=UUID.randomUUID().toString();
         this.skintype = skintype;
-        this.problem = problem;
-        this.treatmentId = treatmentId;
+        this.problems = problems;
+        
+        this.imageUrl=imageUrl;
     }
 
 }
