@@ -1,63 +1,85 @@
 package com.flawlessyou.backend.entity.SkinAnalysis;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-
+import java.util.stream.Collectors;
 
 import com.flawlessyou.backend.entity.product.Type;
 import com.flawlessyou.backend.entity.treatments.Problem;
+import com.flawlessyou.backend.entity.treatments.Treatment;
 
 public class SkinAnalysis {
     private String id;
     private String userId;
     private Type skintype;
-    private Map<Problem, Double> problems; 
-    private String treatmentId;
+    private Map<String, Double> problems; // استخدام Map<String, Double> بدلاً من Map<Problem, Double>
+    private List<Treatment> treatmentId;
     private String imageUrl;
+
+    // Constructor
+    public SkinAnalysis(String userId, Type skintype, Map<Problem, Double> problems) {
+        this.userId = userId;
+        this.id = UUID.randomUUID().toString();
+        this.skintype = skintype;
+        this.problems = convertProblemsMapToStringKeys(problems); // تحويل Map<Problem, Double> إلى Map<String, Double>
+    }
+
+    // دالة لتحويل Map<Problem, Double> إلى Map<String, Double>
+    private Map<String, Double> convertProblemsMapToStringKeys(Map<Problem, Double> problems) {
+        return problems.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().toString(), // استخدام ID الخاص بـ Problem كـ Key
+                        Map.Entry::getValue
+                ));
+    }
+
+    // Getters and Setters
     public String getId() {
         return id;
     }
-    public String getImageUrl() {
-        return imageUrl;
-    }
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
+
     public void setId(String id) {
         this.id = id;
     }
+
     public String getUserId() {
         return userId;
     }
+
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
     public Type getSkintype() {
         return skintype;
     }
+
     public void setSkintype(Type skintype) {
         this.skintype = skintype;
     }
-    public Map<Problem, Double> getProblems() {
+
+    public Map<String, Double> getProblems() {
         return problems;
     }
+
     public void setProblems(Map<Problem, Double> problems) {
-        this.problems = problems;
-    }
-    public String getTreatmentId() {
-        return treatmentId;
-    }
-    public void setTreatmentId(String treatmentId) {
-        this.treatmentId = treatmentId;
-    }
-    public SkinAnalysis(String userId, Type skintype, Map<Problem, Double> problems,String imageUrl) {
-        this.userId = userId;
-        this.id=UUID.randomUUID().toString();
-        this.skintype = skintype;
-        this.problems = problems;
-        
-        this.imageUrl=imageUrl;
+        this.problems = convertProblemsMapToStringKeys(problems);
     }
 
+    public List<Treatment> getTreatmentId() {
+        return treatmentId;
+    }
+
+    public void setTreatmentId(List<Treatment> treatmentId) {
+        this.treatmentId = treatmentId;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

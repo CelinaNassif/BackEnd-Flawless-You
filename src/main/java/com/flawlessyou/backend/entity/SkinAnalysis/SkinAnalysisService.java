@@ -1,6 +1,5 @@
 package com.flawlessyou.backend.entity.SkinAnalysis;
 
-
 import com.flawlessyou.backend.entity.cloudinary.CloudinaryResponse;
 import com.flawlessyou.backend.entity.cloudinary.CloudinaryService;
 import com.flawlessyou.backend.entity.product.Type;
@@ -13,69 +12,115 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 @Service
 public class SkinAnalysisService {
-    private static final Logger logger = LoggerFactory.getLogger(SkinAnalysisService.class);
+
+    private static final Logger logger = Logger.getLogger(SkinAnalysisService.class.getName());
     @Autowired
     private CloudinaryService cloudinaryService;
 
-    private static final String SKIN_ANALYSIS_COLLECTION = "skinAnalysis";
-    private static final String TREATMENTS_COLLECTION = "treatment";
+    @Autowired
+    private Firestore firestore;
 
-    private final Firestore firestore;
+    public SkinAnalysis getRecommendedTreatments(String userId, Type skinType, Map<Problem, Double> problems) throws ExecutionException, InterruptedException {
+        try {
+            // Step 1: Create a SkinAnalysis object
+            SkinAnalysis skinAnalysis = new SkinAnalysis(userId, skinType, problems);
+         
 
-    public SkinAnalysisService() {
-        this.firestore = FirestoreClient.getFirestore();
+            // Step 2: Get treatments based on skin type
+            List<Treatment> treatmentsBySkinType = getTreatmentsBySkinType(skinAnalysis.getSkintype());
+
+            // Step 3: Filter treatments based on problems with values greater than 0
+            Set<Problem> relevantProblems = problems.entrySet().stream()
+                    .filter(entry -> entry.getValue() > 0)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
+                    List<Treatment> t=     treatmentsBySkinType.stream()
+                    .filter(treatment -> relevantProblems.contains(treatment.getProblem()))
+                    .collect(Collectors.toList());
+                
+            // Step 4: Filter treatments that match the relevant problems
+            skinAnalysis.setTreatmentId( t);
+                    saveSkinAnalysis(skinAnalysis);
+                    return skinAnalysis; 
+        } catch (Exception e) {
+            logger.severe("Error in getRecommendedTreatments: " + e.getMessage());
+            throw e;
+        }
     }
 
-    public SkinAnalysis analyzeSkin(String userId, Type skinType, Map<Problem, Double> problems, MultipartFile imageFile) throws ExecutionException, InterruptedException {
-        // 1. Upload image to Cloudinary
-        CloudinaryResponse cloudinaryResponse = cloudinaryService.uploadFile(imageFile, userId + "_skin_analysis");
-        String imageUrl = cloudinaryResponse.getUrl();
+    public List<Treatment> getTreatmentsBySkinType(Type skinType) throws ExecutionException, InterruptedException {
+        List<Treatment> treatments = new ArrayList<>();
 
-        // 2. Find the appropriate treatment
-        Treatment treatment = findTreatmentBySkinTypeAndProblems(skinType, problems);
+        try {
+            // Query Firestore to get treatments by skin type
+            ApiFuture<QuerySnapshot> future = firestore.collection("treatment")
+                    .whereEqualTo("skinType", skinType.toString())
+                    .get();
 
-        // 3. Create SkinAnalysis and save it to Firestore
-        SkinAnalysis skinAnalysis = new SkinAnalysis(userId, skinType, problems, imageUrl);
-        skinAnalysis.setTreatmentId(treatment.getTreatmentId());
-
-        // Save SkinAnalysis to Firestore
-        DocumentReference docRef = firestore.collection(SKIN_ANALYSIS_COLLECTION).document();
-        skinAnalysis.setId(docRef.getId());
-        ApiFuture<WriteResult> result = docRef.set(skinAnalysis);
-        result.get(); // Wait for the save operation to complete
-
-        return skinAnalysis;
-    }
-
-    private Treatment findTreatmentBySkinTypeAndProblems(Type skinType, Map<Problem, Double> problems) throws ExecutionException, InterruptedException {
-        CollectionReference treatmentsRef = firestore.collection(TREATMENTS_COLLECTION);
-        Query query = treatmentsRef.whereEqualTo("skinType", skinType);
-
-        ApiFuture<QuerySnapshot> querySnapshot = query.get();
-        List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
-
-        logger.info("Found {} treatments for skin type: {}", documents.size(), skinType);
-
-        for (QueryDocumentSnapshot document : documents) {
-            Treatment treatment = document.toObject(Treatment.class);
-            Problem treatmentProblem = treatment.getProblem();
-
-            logger.info("Checking treatment: {} with problem: {}", treatment.getTreatmentId(), treatmentProblem);
-
-            if (problems.containsKey(treatmentProblem) && problems.get(treatmentProblem) > 0) {
-                logger.info("Found matching treatment: {}", treatment.getTreatmentId());
-                return treatment;
+            QuerySnapshot querySnapshot = future.get();
+            for (QueryDocumentSnapshot document : querySnapshot.getDocuments()) {
+                Treatment treatment = document.toObject(Treatment.class);
+                treatments.add(treatment);
             }
+        } catch (Exception e) {
+            logger.severe("Error in getTreatmentsBySkinType: " + e.getMessage());
+            throw e;
         }
 
-        logger.error("No treatment found for skin type: {} and problems: {}", skinType, problems);
-        throw new RuntimeException("No treatment found for the given skin type and problems");
+        return treatments;
+    }
+
+
+    private void saveSkinAnalysis(SkinAnalysis skinAnalysis) throws ExecutionException, InterruptedException {
+        try {
+            // Save the SkinAnalysis object to Firestore
+            ApiFuture<WriteResult> future = firestore.collection("skinAnalysis")
+                    .document(skinAnalysis.getId())
+                    .set(skinAnalysis);
+
+            future.get(); // Wait for the operation to complete
+            logger.info("SkinAnalysis saved with ID: " + skinAnalysis.getId());
+        } catch (Exception e) {
+            logger.severe("Error saving SkinAnalysis: " + e.getMessage());
+            throw e;
+        }
+    }
+        public boolean uploadImageAndUpdateSkinAnalysis(String id, MultipartFile imageFile) throws ExecutionException, InterruptedException {
+        try {
+            // 1. التأكد من أن الـ ID غير فارغ
+            if (id == null || id.isEmpty()) {
+                logger.warning("Invalid ID provided for updating image.");
+                return false;
+            }
+
+            // 2. التأكد من أن ملف الصورة غير فارغ
+            if (imageFile == null || imageFile.isEmpty()) {
+                logger.warning("Invalid image file provided.");
+                return false;
+            }
+
+            // 3. رفع الصورة إلى Cloudinary
+            CloudinaryResponse cloudinaryResponse = cloudinaryService.uploadFile(imageFile, id + "_skin_analysis");
+            String imageUrl = cloudinaryResponse.getUrl();
+
+            // 4. تحديث رابط الصورة في Firestore
+            ApiFuture<WriteResult> future = firestore.collection("skinAnalysis")
+                    .document(id)
+                    .update("imageUrl", imageUrl);
+
+            future.get(); // انتظار اكتمال العملية
+            logger.info("Image uploaded and updated successfully for SkinAnalysis with ID: " + id);
+            return true;
+        } catch (Exception e) {
+            logger.severe("Error uploading image or updating SkinAnalysis: " + e.getMessage());
+            throw e;
+        }
     }
 }
