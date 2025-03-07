@@ -5,25 +5,26 @@ import java.util.UUID;
 
 import com.flawlessyou.backend.entity.product.Type;
 
-public class treatment {
+public class Treatment {
 
     private String treatmentId;
     private Type skinType;
-    private String problem;
+    private String description;
+    private Problem problem;
     private List<String> productIds;
-
-
-
-    public treatment( Type skinType, String problem, List<String> productIds) {
+   
+   
+    public Treatment( Type skinType, String description, List<String> productIds,Problem problem) {
         this.treatmentId = UUID.randomUUID().toString();
         this.skinType = skinType;
-        this.problem = problem;
+        this.description = description;
         this.productIds = productIds;
+        this.problem=problem;
     }
 
     
     
-    public treatment() {
+    public Treatment() {
         this.treatmentId = UUID.randomUUID().toString();
     }
 
@@ -40,11 +41,11 @@ public class treatment {
     public void setSkinType(Type skinType) {
         this.skinType = skinType;
     }
-    public String getProblem() {
-        return problem;
+    public String getdescription() {
+        return description;
     }
-    public void setProblem(String problem) {
-        this.problem = problem;
+    public void setdescription(String description) {
+        this.description = description;
     }
     public List<String> getProductIds() {
         return productIds;
@@ -53,7 +54,15 @@ public class treatment {
         this.productIds = productIds;
     }
 
-    
+    public Problem getProblem() {
+        return problem;
+    }
+
+
+
+    public void setProblem(Problem problem) {
+        this.problem = problem;
+    }
 
     
 }

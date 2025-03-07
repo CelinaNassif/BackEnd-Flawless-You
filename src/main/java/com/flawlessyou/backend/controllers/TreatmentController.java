@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.flawlessyou.backend.entity.product.Product;
-import com.flawlessyou.backend.entity.treatments.treatment;
-import com.flawlessyou.backend.entity.treatments.treatmentService;
+import com.flawlessyou.backend.entity.treatments.Treatment;
+import com.flawlessyou.backend.entity.treatments.TreatmentService;
 import org.springframework.web.bind.annotation.RequestBody;
 // import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
@@ -22,20 +22,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/api/treatments")
 public class TreatmentController {
      @Autowired
-    private treatmentService treatmentService;
+    private TreatmentService treatmentService;
 
     @PostMapping
-    public String createTreatment(@RequestBody treatment treatment) throws ExecutionException, InterruptedException {
+    public String createTreatment(@RequestBody Treatment treatment) throws ExecutionException, InterruptedException {
         return treatmentService.createTreatment(treatment);
     }
 
      @GetMapping("/{treatmentId}")
-    public treatment getTreatment(@PathVariable String treatmentId) throws ExecutionException, InterruptedException {
+    public Treatment getTreatment(@PathVariable String treatmentId) throws ExecutionException, InterruptedException {
         return treatmentService.getTreatment(treatmentId);
     }
 
     @PutMapping("/{treatmentId}")
-    public String updateTreatment(@PathVariable String treatmentId, @RequestBody treatment updatedTreatment) throws ExecutionException, InterruptedException {
+    public String updateTreatment(@PathVariable String treatmentId, @RequestBody Treatment updatedTreatment) throws ExecutionException, InterruptedException {
         return treatmentService.updateTreatment(treatmentId, updatedTreatment);
     }
 
@@ -46,12 +46,12 @@ public class TreatmentController {
 
 
     @GetMapping
-    public List<treatment> getAllTreatments() throws ExecutionException, InterruptedException {
+    public List<Treatment> getAllTreatments() throws ExecutionException, InterruptedException {
         return treatmentService.getAllTreatments();
     }
 
     @GetMapping("/skinType/{skinType}")
-    public List<treatment> getTreatmentsBySkinType(@PathVariable String skinType) throws ExecutionException, InterruptedException {
+    public List<Treatment> getTreatmentsBySkinType(@PathVariable String skinType) throws ExecutionException, InterruptedException {
         return treatmentService.getTreatmentsBySkinType(skinType);
     }
     
