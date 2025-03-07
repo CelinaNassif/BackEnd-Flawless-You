@@ -22,7 +22,7 @@ public class SkinAnalysisService {
     @Autowired
     private Firestore firestore;
 
-    public List<Treatment> getRecommendedTreatments(String userId, Type skinType, Map<Problem, Double> problems) throws ExecutionException, InterruptedException {
+    public SkinAnalysis getRecommendedTreatments(String userId, Type skinType, Map<Problem, Double> problems) throws ExecutionException, InterruptedException {
         try {
             // Step 1: Create a SkinAnalysis object
             SkinAnalysis skinAnalysis = new SkinAnalysis(userId, skinType, problems);
@@ -36,11 +36,14 @@ public class SkinAnalysisService {
                     .filter(entry -> entry.getValue() > 0)
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toSet());
-
-            // Step 4: Filter treatments that match the relevant problems
-            return treatmentsBySkinType.stream()
+                    List<Treatment> t=     treatmentsBySkinType.stream()
                     .filter(treatment -> relevantProblems.contains(treatment.getProblem()))
                     .collect(Collectors.toList());
+                
+            // Step 4: Filter treatments that match the relevant problems
+            skinAnalysis.setTreatmentId( t);
+                    saveSkinAnalysis(skinAnalysis);
+                    return skinAnalysis; 
         } catch (Exception e) {
             logger.severe("Error in getRecommendedTreatments: " + e.getMessage());
             throw e;
@@ -67,5 +70,21 @@ public class SkinAnalysisService {
         }
 
         return treatments;
+    }
+
+
+    private void saveSkinAnalysis(SkinAnalysis skinAnalysis) throws ExecutionException, InterruptedException {
+        try {
+            // Save the SkinAnalysis object to Firestore
+            ApiFuture<WriteResult> future = firestore.collection("skinAnalysis")
+                    .document(skinAnalysis.getId())
+                    .set(skinAnalysis);
+
+            future.get(); // Wait for the operation to complete
+            logger.info("SkinAnalysis saved with ID: " + skinAnalysis.getId());
+        } catch (Exception e) {
+            logger.severe("Error saving SkinAnalysis: " + e.getMessage());
+            throw e;
+        }
     }
 }

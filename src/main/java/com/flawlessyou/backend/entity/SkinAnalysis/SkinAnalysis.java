@@ -1,5 +1,6 @@
 package com.flawlessyou.backend.entity.SkinAnalysis;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -7,13 +8,14 @@ import java.util.UUID;
 
 import com.flawlessyou.backend.entity.product.Type;
 import com.flawlessyou.backend.entity.treatments.Problem;
+import com.flawlessyou.backend.entity.treatments.Treatment;
 
 public class SkinAnalysis {
     private String id;
     private String userId;
     private Type skintype;
     private Map<Problem, Double> problems; 
-    private String treatmentId;
+    private List<Treatment> treatmentId;
     private String imageUrl;
     public String getId() {
         return id;
@@ -45,10 +47,10 @@ public class SkinAnalysis {
     public void setProblems(Map<Problem, Double> problems) {
         this.problems = problems;
     }
-    public String getTreatmentId() {
+    public List<Treatment> getTreatmentId() {
         return treatmentId;
     }
-    public void setTreatmentId(String treatmentId) {
+    public void setTreatmentId(List<Treatment> treatmentId) {
         this.treatmentId = treatmentId;
     }
     public SkinAnalysis(String userId, Type skintype, Map<Problem, Double> problems) {

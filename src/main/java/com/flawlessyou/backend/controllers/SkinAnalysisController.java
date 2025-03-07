@@ -29,7 +29,7 @@ public class SkinAnalysisController {
 
 
     @PostMapping("/recommend-treatments")
-    public List<Treatment> recommendTreatments(
+    public SkinAnalysis recommendTreatments(
       
             @RequestParam Type skinType,
             HttpServletRequest request,
