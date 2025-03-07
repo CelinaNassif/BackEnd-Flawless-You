@@ -73,8 +73,8 @@ public class treatmentService {
             if (updatedTreatment.getSkinType() != null) {
                 existingTreatment.setSkinType(updatedTreatment.getSkinType());
             }
-            if (updatedTreatment.getProblem() != null) {
-                existingTreatment.setProblem(updatedTreatment.getProblem());
+            if (updatedTreatment.getdescription() != null) {
+                existingTreatment.setdescription(updatedTreatment.getdescription());
             }
             if (updatedTreatment.getProductIds() != null) {
                 existingTreatment.setProductIds(updatedTreatment.getProductIds());
