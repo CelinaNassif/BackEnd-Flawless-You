@@ -51,13 +51,12 @@ public class SkinAnalysis {
     public void setTreatmentId(String treatmentId) {
         this.treatmentId = treatmentId;
     }
-    public SkinAnalysis(String userId, Type skintype, Map<Problem, Double> problems,String imageUrl) {
+    public SkinAnalysis(String userId, Type skintype, Map<Problem, Double> problems) {
         this.userId = userId;
         this.id=UUID.randomUUID().toString();
         this.skintype = skintype;
         this.problems = problems;
         
-        this.imageUrl=imageUrl;
     }
 
 }
