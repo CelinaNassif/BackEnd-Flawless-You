@@ -2,6 +2,7 @@ package com.flawlessyou.backend.entity.SkinAnalysis;
 
 import com.flawlessyou.backend.entity.cloudinary.CloudinaryResponse;
 import com.flawlessyou.backend.entity.cloudinary.CloudinaryService;
+import com.flawlessyou.backend.entity.product.Product;
 import com.flawlessyou.backend.entity.product.Type;
 import com.flawlessyou.backend.entity.treatments.Problem;
 import com.flawlessyou.backend.entity.treatments.Treatment;
@@ -122,5 +123,44 @@ public class SkinAnalysisService {
             logger.severe("Error uploading image or updating SkinAnalysis: " + e.getMessage());
             throw e;
         }
+    }
+
+      public  List<Product> getProductsBySkinAnalysisId(String skinAnalysisId) throws Exception{
+        // 1. الحصول على SkinAnalysis من Firestore باستخدام skinAnalysisId
+        DocumentReference skinAnalysisRef = firestore.collection("skinAnalysis").document(skinAnalysisId);
+        ApiFuture<DocumentSnapshot> skinAnalysisFuture = skinAnalysisRef.get();
+        DocumentSnapshot skinAnalysisDoc = skinAnalysisFuture.get();
+
+        if (!skinAnalysisDoc.exists()) {
+            throw new IllegalArgumentException("SkinAnalysis not found with id: " + skinAnalysisId);
+        }
+
+        // تحويل DocumentSnapshot إلى كائن SkinAnalysis
+        SkinAnalysis skinAnalysis = skinAnalysisDoc.toObject(SkinAnalysis.class);
+
+        // 2. استرداد Treatments المرتبطة بـ SkinAnalysis
+        List<Treatment> treatments = skinAnalysis.getTreatmentId();
+
+        // 3. جمع جميع productIds من Treatments
+        Set<String> productIds = new HashSet<>();
+        for (Treatment treatment : treatments) {
+            productIds.addAll(treatment.getProductIds());
+        }
+
+        // 4. استرداد تفاصيل المنتجات من Firestore باستخدام productIds
+        List<Product> products = new ArrayList<>();
+        for (String productId : productIds) {
+            DocumentReference productRef = firestore.collection("products").document(productId);
+            ApiFuture<DocumentSnapshot> productFuture = productRef.get();
+            DocumentSnapshot productDoc = productFuture.get();
+
+            if (productDoc.exists()) {
+                Product product = productDoc.toObject(Product.class);
+                products.add(product);
+            }
+        }
+
+        // 5. إعادة قائمة المنتجات
+        return products;
     }
 }

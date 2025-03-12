@@ -2,6 +2,7 @@ package com.flawlessyou.backend.controllers;
 
 import com.flawlessyou.backend.config.GetUser;
 import com.flawlessyou.backend.entity.SkinAnalysis.SkinAnalysis;
+import com.flawlessyou.backend.entity.product.Product;
 import com.flawlessyou.backend.entity.product.Type;
 import com.flawlessyou.backend.entity.treatments.Problem;
 import com.flawlessyou.backend.entity.treatments.Treatment;
@@ -69,5 +70,11 @@ public class SkinAnalysisController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error uploading image: " + e.getMessage());
         }
+    }
+       @GetMapping("/{skinAnalysisId}/products")
+    public List<Product> getProductsBySkinAnalysisId(@PathVariable String skinAnalysisId) throws Exception{
+
+            return skinAnalysisService.getProductsBySkinAnalysisId(skinAnalysisId);
+       
     }
 }
