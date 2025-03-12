@@ -13,7 +13,7 @@ public class SkinAnalysis {
     private String id;
     private String userId;
     private Type skintype;
-    private Map<String, Double> problems; // استخدام Map<String, Double> بدلاً من Map<Problem, Double>
+    private Map<Problem, Double> problems; // استخدام Map<String, Double> بدلاً من Map<Problem, Double>
     private List<Treatment> treatmentId;
     private String imageUrl;
 
@@ -22,17 +22,10 @@ public class SkinAnalysis {
         this.userId = userId;
         this.id = UUID.randomUUID().toString();
         this.skintype = skintype;
-        this.problems = convertProblemsMapToStringKeys(problems); // تحويل Map<Problem, Double> إلى Map<String, Double>
+        this.problems =problems; // تحويل Map<Problem, Double> إلى Map<String, Double>
     }
 
-    // دالة لتحويل Map<Problem, Double> إلى Map<String, Double>
-    private Map<String, Double> convertProblemsMapToStringKeys(Map<Problem, Double> problems) {
-        return problems.entrySet().stream()
-                .collect(Collectors.toMap(
-                        entry -> entry.getKey().toString(), // استخدام ID الخاص بـ Problem كـ Key
-                        Map.Entry::getValue
-                ));
-    }
+  
 
     // Getters and Setters
     public String getId() {
@@ -59,12 +52,12 @@ public class SkinAnalysis {
         this.skintype = skintype;
     }
 
-    public Map<String, Double> getProblems() {
+    public Map<Problem, Double> getProblems() {
         return problems;
     }
 
     public void setProblems(Map<Problem, Double> problems) {
-        this.problems = convertProblemsMapToStringKeys(problems);
+        this.problems = problems;
     }
 
     public List<Treatment> getTreatmentId() {
