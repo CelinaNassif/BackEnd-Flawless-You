@@ -13,7 +13,7 @@ public class SkinAnalysis {
     private String id;
     private String userId;
     private Type skintype;
-    private Map<Problem, Double> problems; // استخدام Map<String, Double> بدلاً من Map<Problem, Double>
+    private Map<String, Double> problems; // تم تغيير النوع إلى Map<String, Double>
     private List<Treatment> treatmentId;
     private String imageUrl;
 
@@ -22,10 +22,20 @@ public class SkinAnalysis {
         this.userId = userId;
         this.id = UUID.randomUUID().toString();
         this.skintype = skintype;
-        this.problems =problems; // تحويل Map<Problem, Double> إلى Map<String, Double>
+        this.problems = convertProblemsMap(problems); // تحويل Map<Problem, Double> إلى Map<String, Double>
     }
 
-  
+    public SkinAnalysis() {
+    }
+
+    // طريقة لتحويل Map<Problem, Double> إلى Map<String, Double>
+    private Map<String, Double> convertProblemsMap(Map<Problem, Double> problems) {
+        return problems.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().name(), // تحويل Enum إلى String
+                        Map.Entry::getValue
+                ));
+    }
 
     // Getters and Setters
     public String getId() {
@@ -52,11 +62,11 @@ public class SkinAnalysis {
         this.skintype = skintype;
     }
 
-    public Map<Problem, Double> getProblems() {
+    public Map<String, Double> getProblems() {
         return problems;
     }
 
-    public void setProblems(Map<Problem, Double> problems) {
+    public void setProblems(Map<String, Double> problems) {
         this.problems = problems;
     }
 
