@@ -2,6 +2,7 @@ package com.flawlessyou.backend.entity.SkinAnalysis;
 
 import com.flawlessyou.backend.entity.cloudinary.CloudinaryResponse;
 import com.flawlessyou.backend.entity.cloudinary.CloudinaryService;
+import com.flawlessyou.backend.entity.product.Product;
 import com.flawlessyou.backend.entity.product.Type;
 import com.flawlessyou.backend.entity.treatments.Problem;
 import com.flawlessyou.backend.entity.treatments.Treatment;
@@ -31,24 +32,24 @@ public class SkinAnalysisService {
         try {
             // Step 1: Create a SkinAnalysis object
             SkinAnalysis skinAnalysis = new SkinAnalysis(userId, skinType, problems);
-         
-
+    
             // Step 2: Get treatments based on skin type
             List<Treatment> treatmentsBySkinType = getTreatmentsBySkinType(skinAnalysis.getSkintype());
-
+    
             // Step 3: Filter treatments based on problems with values greater than 0
             Set<Problem> relevantProblems = problems.entrySet().stream()
                     .filter(entry -> entry.getValue() > 0)
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toSet());
-                    List<Treatment> t=     treatmentsBySkinType.stream()
+    
+            List<Treatment> t = treatmentsBySkinType.stream()
                     .filter(treatment -> relevantProblems.contains(treatment.getProblem()))
                     .collect(Collectors.toList());
-                
+    
             // Step 4: Filter treatments that match the relevant problems
-            skinAnalysis.setTreatmentId( t);
-                    saveSkinAnalysis(skinAnalysis);
-                    return skinAnalysis; 
+            skinAnalysis.setTreatmentId(t);
+            saveSkinAnalysis(skinAnalysis);
+            return skinAnalysis;
         } catch (Exception e) {
             logger.severe("Error in getRecommendedTreatments: " + e.getMessage());
             throw e;
@@ -122,5 +123,49 @@ public class SkinAnalysisService {
             logger.severe("Error uploading image or updating SkinAnalysis: " + e.getMessage());
             throw e;
         }
+    }
+
+    public Map<String, List<Product>> getProductsBySkinAnalysisId(String skinAnalysisId) throws Exception {
+        // 1. الحصول على SkinAnalysis من Firestore باستخدام skinAnalysisId
+        DocumentReference skinAnalysisRef = firestore.collection("skinAnalysis").document(skinAnalysisId);
+        ApiFuture<DocumentSnapshot> skinAnalysisFuture = skinAnalysisRef.get();
+        DocumentSnapshot skinAnalysisDoc = skinAnalysisFuture.get();
+    
+        if (!skinAnalysisDoc.exists()) {
+            throw new IllegalArgumentException("SkinAnalysis not found with id: " + skinAnalysisId);
+        }
+    
+        // تحويل DocumentSnapshot إلى كائن SkinAnalysis
+        SkinAnalysis skinAnalysis = skinAnalysisDoc.toObject(SkinAnalysis.class);
+    
+        // 2. استرداد Treatments المرتبطة بـ SkinAnalysis
+        List<Treatment> treatments = skinAnalysis.getTreatmentId();
+    
+        // 3. إنشاء خريطة لتخزين المنتجات الخاصة بكل مشكلة
+        Map<String, List<Product>> productsByProblem = new HashMap<>();
+    
+        // 4. جمع جميع productIds من Treatments وتجميعها حسب المشكلة
+        for (Treatment treatment : treatments) {
+            String problem = treatment.getProblem().name();
+            List<String> productIds = treatment.getProductIds();
+    
+            // 5. استرداد تفاصيل المنتجات من Firestore باستخدام productIds
+            List<Product> products = new ArrayList<>();
+            for (String productId : productIds) {
+                DocumentReference productRef = firestore.collection("products").document(productId);
+                ApiFuture<DocumentSnapshot> productFuture = productRef.get();
+                DocumentSnapshot productDoc = productFuture.get();
+    
+                if (productDoc.exists()) {
+                    Product product = productDoc.toObject(Product.class);
+                    products.add(product);
+                }
+            }
+    
+            // 6. إضافة المنتجات إلى الخريطة حسب المشكلة
+            productsByProblem.put(problem, products);
+        }
+    
+        return productsByProblem;
     }
 }
