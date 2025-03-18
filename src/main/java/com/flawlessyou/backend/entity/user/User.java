@@ -56,7 +56,7 @@ public class User {
         this.hashedPassword = hashedPassword;
     }
 
-  
+   
 
     public User( String userName, String email, String phoneNumber, Gender gender, String skinType,
             String hashedPassword, String profilePicture, LocalDate dateOfBirth) {
