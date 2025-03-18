@@ -31,6 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -187,7 +191,27 @@ public class UserController {
         return userService.getUsersByUsername(username);
     }
 
+    @PutMapping("/info")
+    public ResponseEntity<String> updateUserInfo(
+        HttpServletRequest request,
+            @RequestParam(required = false) String phoneNumber,
+            @RequestParam(required = false) Gender gender) throws Exception {
 
+        try {
+            User user = getUser.userFromToken(request);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
+    
+            // استدعاء service لتحديث معلومات المستخدم
+            userService.updateUserInfo(user.getUserId(), phoneNumber, gender);
+            return ResponseEntity.ok("User information updated successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (ExecutionException | InterruptedException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating user information.");
+        }
+    }
     @PutMapping("/{userId}/role")
     public ResponseEntity<?> updateUserRole(
             @PathVariable String userId,
