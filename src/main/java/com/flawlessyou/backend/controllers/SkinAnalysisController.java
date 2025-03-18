@@ -32,7 +32,6 @@ public class SkinAnalysisController {
 
     @PostMapping("/recommend-treatments")
     public SkinAnalysis recommendTreatments(
-      
             @RequestParam Type skinType,
             HttpServletRequest request,
             @RequestBody Map<Problem, Double> problems) throws Exception, InterruptedException {
@@ -72,7 +71,7 @@ public class SkinAnalysisController {
         }
     }
        @GetMapping("/{skinAnalysisId}/products")
-    public List<Product> getProductsBySkinAnalysisId(@PathVariable String skinAnalysisId) throws Exception{
+    public Map<String, List<Product>> getProductsBySkinAnalysisId(@PathVariable String skinAnalysisId) throws Exception{
 
             return skinAnalysisService.getProductsBySkinAnalysisId(skinAnalysisId);
        
