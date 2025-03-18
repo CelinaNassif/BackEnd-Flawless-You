@@ -101,26 +101,29 @@ public class AuthController {
                 return ResponseEntity.badRequest()
                     .body(new MessageResponse("Username is already taken!"));
             }
-
+    
             if (userService.existsByEmail(signUpRequest.getEmail())) {
                 return ResponseEntity.badRequest()
                     .body(new MessageResponse("Email is already in use!"));
             }
-
+    
+            String encodedPassword = encoder.encode(signUpRequest.getPassword());
+            logger.info("Encoded password: " + encodedPassword);
+    
             User user = new User(
                 signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword())
+                signUpRequest.getPhoneNumber(),
+                signUpRequest.getGender(),
+                encodedPassword
             );
-        
-        //     SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
-        // List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        // authorities.add(authority);
-        user.setRole(Role.USER);
+    
+            user.setRole(Role.USER);
             userService.saveUser(user);
             return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
-
+    
         } catch (Exception e) {
+            logger.error("Registration failed: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new MessageResponse("Registration failed: " + e.getMessage()));
         }

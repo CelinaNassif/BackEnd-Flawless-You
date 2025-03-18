@@ -137,7 +137,27 @@ public void updateUserRole(String userId, Role newRole) throws ExecutionExceptio
 }
 
 
+public void updateUserInfo(String userId, String phoneNumber, Gender gender) throws ExecutionException, InterruptedException {
+    // التحقق من صحة البيانات
+    if (userId == null || userId.isEmpty()) {
+        throw new IllegalArgumentException("User ID must not be null or empty.");
+    }
 
+    // إنشاء Map لتحديث الحقول
+    Map<String, Object> updates = new HashMap<>();
+    if (phoneNumber != null) {
+        updates.put("phoneNumber", phoneNumber);
+    }
+    if (gender != null) {
+        updates.put("gender", gender);
+    }
+
+    // إذا كانت هناك حقول لتحديثها
+    if (!updates.isEmpty()) {
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(userId);
+        docRef.update(updates).get(); // تنفيذ التحديث
+    }
+}
 
 
 

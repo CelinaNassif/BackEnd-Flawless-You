@@ -48,12 +48,12 @@ public class User {
 
 
     
-    public User(String userName, String email, String phoneNumber, Gender gender) {
+    public User(String userName, String email, String phoneNumber, Gender gender,  String hashedPassword) {
         this.userName = userName;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.gender = gender;
-       
+        this.hashedPassword = hashedPassword;
     }
 
 
