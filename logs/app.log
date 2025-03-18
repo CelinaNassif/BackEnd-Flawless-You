@@ -46926,3 +46926,180 @@ org.springframework.security.authentication.BadCredentialsException: Bad credent
 2025-03-18T15:04:43.738+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [{timestamp=Tue Mar 18 15:04:43 EET 2025, status=400, error=Bad Request, path=/api/auth/signup}]
 2025-03-18T15:04:43.837+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet        : Exiting from "ERROR" dispatch, status 400
 2025-03-18T15:04:43.853+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T16:06:25.636+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/signup
+2025-03-18T16:06:25.700+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T16:06:25.716+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/signup
+2025-03-18T16:06:25.732+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : POST "/api/auth/signup", parameters={}
+2025-03-18T16:06:25.748+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.flawlessyou.backend.controllers.AuthController#registerUser(SignupRequest)
+2025-03-18T16:06:25.843+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=utf-8" to [com.flawlessyou.backend.Payload.Request.SignupRequest@1d0380c1]
+2025-03-18T16:06:25.985+02:00  WARN 12704 --- [http-nio-8080-exec-4] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<?> com.flawlessyou.backend.controllers.AuthController.registerUser(com.flawlessyou.backend.Payload.Request.SignupRequest): [Field error in object 'signupRequest' on field 'phoneNumber': rejected value [222222222]; codes [Size.signupRequest.phoneNumber,Size.phoneNumber,Size.java.lang.String,Size]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [signupRequest.phoneNumber,phoneNumber]; arguments []; default message [phoneNumber],15,10]; default message [ the phone number size must be between 6 and 40]] ]
+2025-03-18T16:06:25.985+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Completed 400 BAD_REQUEST
+2025-03-18T16:06:26.019+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Securing POST /error
+2025-03-18T16:06:26.025+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Secured POST /error
+2025-03-18T16:06:26.028+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : "ERROR" dispatch for POST "/error", parameters={}
+2025-03-18T16:06:26.033+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+2025-03-18T16:06:26.075+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+2025-03-18T16:06:26.095+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [{timestamp=Tue Mar 18 16:06:26 EET 2025, status=400, error=Bad Request, path=/api/auth/signup}]
+2025-03-18T16:06:26.134+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Exiting from "ERROR" dispatch, status 400
+2025-03-18T16:06:26.136+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T16:06:35.235+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/signup
+2025-03-18T16:06:35.237+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T16:06:35.237+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/signup
+2025-03-18T16:06:35.237+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : POST "/api/auth/signup", parameters={}
+2025-03-18T16:06:35.237+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.flawlessyou.backend.controllers.AuthController#registerUser(SignupRequest)
+2025-03-18T16:06:35.249+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=utf-8" to [com.flawlessyou.backend.Payload.Request.SignupRequest@61ab7d4c]
+2025-03-18T16:06:35.252+02:00  WARN 12704 --- [http-nio-8080-exec-6] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<?> com.flawlessyou.backend.controllers.AuthController.registerUser(com.flawlessyou.backend.Payload.Request.SignupRequest): [Field error in object 'signupRequest' on field 'phoneNumber': rejected value [222222222]; codes [Size.signupRequest.phoneNumber,Size.phoneNumber,Size.java.lang.String,Size]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [signupRequest.phoneNumber,phoneNumber]; arguments []; default message [phoneNumber],15,10]; default message [ the phone number size must be between 6 and 40]] ]
+2025-03-18T16:06:35.254+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : Completed 400 BAD_REQUEST
+2025-03-18T16:06:35.258+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Securing POST /error
+2025-03-18T16:06:35.263+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Secured POST /error
+2025-03-18T16:06:35.265+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : "ERROR" dispatch for POST "/error", parameters={}
+2025-03-18T16:06:35.266+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+2025-03-18T16:06:35.268+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+2025-03-18T16:06:35.268+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [{timestamp=Tue Mar 18 16:06:35 EET 2025, status=400, error=Bad Request, path=/api/auth/signup}]
+2025-03-18T16:06:35.275+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : Exiting from "ERROR" dispatch, status 400
+2025-03-18T16:06:35.275+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T16:07:09.393+02:00 DEBUG 12704 --- [http-nio-8080-exec-8] o.s.security.web.FilterChainProxy        : Securing GET /api/auth/signup
+2025-03-18T16:07:09.393+02:00 DEBUG 12704 --- [http-nio-8080-exec-8] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T16:07:09.466+02:00 DEBUG 12704 --- [http-nio-8080-exec-8] o.s.security.web.FilterChainProxy        : Secured GET /api/auth/signup
+2025-03-18T16:07:09.469+02:00 DEBUG 12704 --- [http-nio-8080-exec-8] o.s.web.servlet.DispatcherServlet        : GET "/api/auth/signup", parameters={}
+2025-03-18T16:07:09.609+02:00  WARN 12704 --- [http-nio-8080-exec-8] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'GET' is not supported]
+2025-03-18T16:07:09.613+02:00 DEBUG 12704 --- [http-nio-8080-exec-8] o.s.web.servlet.DispatcherServlet        : Completed 405 METHOD_NOT_ALLOWED
+2025-03-18T16:07:09.664+02:00 DEBUG 12704 --- [http-nio-8080-exec-8] o.s.security.web.FilterChainProxy        : Securing GET /error
+2025-03-18T16:07:09.664+02:00 DEBUG 12704 --- [http-nio-8080-exec-8] o.s.security.web.FilterChainProxy        : Secured GET /error
+2025-03-18T16:07:09.664+02:00 DEBUG 12704 --- [http-nio-8080-exec-8] o.s.web.servlet.DispatcherServlet        : "ERROR" dispatch for GET "/error", parameters={}
+2025-03-18T16:07:09.675+02:00 DEBUG 12704 --- [http-nio-8080-exec-8] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#errorHtml(HttpServletRequest, HttpServletResponse)
+2025-03-18T16:07:11.589+02:00 DEBUG 12704 --- [http-nio-8080-exec-8] o.s.w.s.v.ContentNegotiatingViewResolver : Selected 'text/html' given [text/html, text/html;q=0.8]
+2025-03-18T16:07:11.871+02:00 DEBUG 12704 --- [http-nio-8080-exec-8] o.s.web.servlet.DispatcherServlet        : Exiting from "ERROR" dispatch, status 405
+2025-03-18T16:07:11.875+02:00 DEBUG 12704 --- [http-nio-8080-exec-8] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T16:07:12.230+02:00 DEBUG 12704 --- [http-nio-8080-exec-9] o.s.security.web.FilterChainProxy        : Securing GET /favicon.ico
+2025-03-18T16:07:12.230+02:00 DEBUG 12704 --- [http-nio-8080-exec-9] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T16:07:12.502+02:00 ERROR 12704 --- [http-nio-8080-exec-9] c.f.b.Security.Jwt.AuthEntryPointJwt     : Unauthorized error: Full authentication is required to access this resource
+2025-03-18T16:08:44.775+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/signup
+2025-03-18T16:08:44.781+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T16:08:44.783+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/signup
+2025-03-18T16:08:44.826+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : POST "/api/auth/signup", parameters={}
+2025-03-18T16:08:44.834+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.flawlessyou.backend.controllers.AuthController#registerUser(SignupRequest)
+2025-03-18T16:08:44.963+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] o.s.web.method.HandlerMethod             : Could not resolve parameter [0] in public org.springframework.http.ResponseEntity<?> com.flawlessyou.backend.controllers.AuthController.registerUser(com.flawlessyou.backend.Payload.Request.SignupRequest): JSON parse error: Unexpected character ('u' (code 117)): was expecting double-quote to start field name
+2025-03-18T16:08:45.073+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler com.flawlessyou.backend.exception.CustomExceptionHandler#handleRuntimeException(RuntimeException)
+2025-03-18T16:08:45.174+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] m.m.a.RequestResponseBodyMethodProcessor : Using 'text/plain', given [*/*] and supported [text/plain, */*, application/json, application/*+json, application/yaml]
+2025-03-18T16:08:45.178+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] m.m.a.RequestResponseBodyMethodProcessor : Writing ["Error: JSON parse error: Unexpected character ('u' (code 117)): was expecting double-quote to start  (truncated)..."]
+2025-03-18T16:08:45.200+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Unexpected character ('u' (code 117)): was expecting double-quote to start field name]
+2025-03-18T16:08:45.207+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed 500 INTERNAL_SERVER_ERROR
+2025-03-18T16:10:56.362+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/signup
+2025-03-18T16:10:56.382+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T16:10:56.382+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/signup
+2025-03-18T16:10:56.382+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : POST "/api/auth/signup", parameters={}
+2025-03-18T16:10:56.382+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.flawlessyou.backend.controllers.AuthController#registerUser(SignupRequest)
+2025-03-18T16:10:56.382+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=utf-8" to [com.flawlessyou.backend.Payload.Request.SignupRequest@679c7fe2]
+2025-03-18T16:10:56.410+02:00  WARN 12704 --- [http-nio-8080-exec-5] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<?> com.flawlessyou.backend.controllers.AuthController.registerUser(com.flawlessyou.backend.Payload.Request.SignupRequest): [Field error in object 'signupRequest' on field 'phoneNumber': rejected value [222222222]; codes [Size.signupRequest.phoneNumber,Size.phoneNumber,Size.java.lang.String,Size]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [signupRequest.phoneNumber,phoneNumber]; arguments []; default message [phoneNumber],15,10]; default message [ the phone number size must be between 6 and 40]] ]
+2025-03-18T16:10:56.417+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : Completed 400 BAD_REQUEST
+2025-03-18T16:10:56.422+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] o.s.security.web.FilterChainProxy        : Securing POST /error
+2025-03-18T16:10:56.432+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] o.s.security.web.FilterChainProxy        : Secured POST /error
+2025-03-18T16:10:56.434+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : "ERROR" dispatch for POST "/error", parameters={}
+2025-03-18T16:10:56.436+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+2025-03-18T16:10:56.447+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+2025-03-18T16:10:56.449+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [{timestamp=Tue Mar 18 16:10:56 EET 2025, status=400, error=Bad Request, path=/api/auth/signup}]
+2025-03-18T16:10:56.455+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : Exiting from "ERROR" dispatch, status 400
+2025-03-18T16:10:56.455+02:00 DEBUG 12704 --- [http-nio-8080-exec-5] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T16:11:08.078+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/signup
+2025-03-18T16:11:08.078+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T16:11:08.078+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/signup
+2025-03-18T16:11:08.078+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : POST "/api/auth/signup", parameters={}
+2025-03-18T16:11:08.095+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.flawlessyou.backend.controllers.AuthController#registerUser(SignupRequest)
+2025-03-18T16:11:08.095+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=utf-8" to [com.flawlessyou.backend.Payload.Request.SignupRequest@35e48516]
+2025-03-18T16:11:08.095+02:00  WARN 12704 --- [http-nio-8080-exec-1] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<?> com.flawlessyou.backend.controllers.AuthController.registerUser(com.flawlessyou.backend.Payload.Request.SignupRequest): [Field error in object 'signupRequest' on field 'phoneNumber': rejected value [222222222]; codes [Size.signupRequest.phoneNumber,Size.phoneNumber,Size.java.lang.String,Size]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [signupRequest.phoneNumber,phoneNumber]; arguments []; default message [phoneNumber],15,10]; default message [ the phone number size must be between 6 and 40]] ]
+2025-03-18T16:11:08.095+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed 400 BAD_REQUEST
+2025-03-18T16:11:08.109+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing POST /error
+2025-03-18T16:11:08.109+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Secured POST /error
+2025-03-18T16:11:08.109+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : "ERROR" dispatch for POST "/error", parameters={}
+2025-03-18T16:11:08.118+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+2025-03-18T16:11:08.118+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+2025-03-18T16:11:08.118+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [{timestamp=Tue Mar 18 16:11:08 EET 2025, status=400, error=Bad Request, path=/api/auth/signup}]
+2025-03-18T16:11:08.118+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Exiting from "ERROR" dispatch, status 400
+2025-03-18T16:11:08.118+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T16:11:39.528+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/signup
+2025-03-18T16:11:39.533+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T16:11:39.535+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/signup
+2025-03-18T16:11:39.537+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet        : POST "/api/auth/signup", parameters={}
+2025-03-18T16:11:39.539+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.flawlessyou.backend.controllers.AuthController#registerUser(SignupRequest)
+2025-03-18T16:11:39.547+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=utf-8" to [com.flawlessyou.backend.Payload.Request.SignupRequest@3cc39b95]
+2025-03-18T16:11:39.554+02:00  WARN 12704 --- [http-nio-8080-exec-7] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<?> com.flawlessyou.backend.controllers.AuthController.registerUser(com.flawlessyou.backend.Payload.Request.SignupRequest): [Field error in object 'signupRequest' on field 'phoneNumber': rejected value [222222222]; codes [Size.signupRequest.phoneNumber,Size.phoneNumber,Size.java.lang.String,Size]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [signupRequest.phoneNumber,phoneNumber]; arguments []; default message [phoneNumber],15,10]; default message [ the phone number size must be between 6 and 40]] ]
+2025-03-18T16:11:39.559+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet        : Completed 400 BAD_REQUEST
+2025-03-18T16:11:39.563+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.security.web.FilterChainProxy        : Securing POST /error
+2025-03-18T16:11:39.568+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.security.web.FilterChainProxy        : Secured POST /error
+2025-03-18T16:11:39.569+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet        : "ERROR" dispatch for POST "/error", parameters={}
+2025-03-18T16:11:39.570+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+2025-03-18T16:11:39.576+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+2025-03-18T16:11:39.586+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [{timestamp=Tue Mar 18 16:11:39 EET 2025, status=400, error=Bad Request, path=/api/auth/signup}]
+2025-03-18T16:11:39.593+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet        : Exiting from "ERROR" dispatch, status 400
+2025-03-18T16:11:39.603+02:00 DEBUG 12704 --- [http-nio-8080-exec-7] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T17:20:12.247+02:00  WARN 12704 --- [RMI TCP Connection(5)-127.0.0.1] javax.management.remote.misc             : The server has decided to close this client connection.
+2025-03-18T17:33:40.581+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/signup
+2025-03-18T17:33:40.712+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T17:33:40.741+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/signup
+2025-03-18T17:33:40.764+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : POST "/api/auth/signup", parameters={}
+2025-03-18T17:33:40.778+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.flawlessyou.backend.controllers.AuthController#registerUser(SignupRequest)
+2025-03-18T17:33:40.974+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=utf-8" to [com.flawlessyou.backend.Payload.Request.SignupRequest@4787ef7e]
+2025-03-18T17:33:44.564+02:00  INFO 12704 --- [http-nio-8080-exec-4] c.f.backend.controllers.AuthController   : Encoded password: $2a$10$DGlY1FUhSRteTr.GgJZfnux4ZNlp5X2ydk7111SUEBeEtxQtOdc/2
+2025-03-18T17:33:44.896+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+2025-03-18T17:33:44.927+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [com.flawlessyou.backend.Payload.Response.MessageResponse@c9f56a3]
+2025-03-18T17:33:44.968+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-03-18T17:33:45.299+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/signin
+2025-03-18T17:33:45.302+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T17:33:45.305+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/signin
+2025-03-18T17:33:45.306+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : POST "/api/auth/signin", parameters={}
+2025-03-18T17:33:45.307+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.flawlessyou.backend.controllers.AuthController#authenticateUser(LoginRequest)
+2025-03-18T17:33:45.312+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=utf-8" to [com.flawlessyou.backend.Payload.Request.LoginRequest@7412267f]
+2025-03-18T17:33:45.603+02:00  INFO 12704 --- [http-nio-8080-exec-6] com.flawlessyou.backend.config.GetUser   : User role: USER
+2025-03-18T17:33:45.767+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.s.a.dao.DaoAuthenticationProvider    : Authenticated user
+2025-03-18T17:33:45.806+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+2025-03-18T17:33:45.808+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [com.flawlessyou.backend.Payload.Response.JwtResponse@1eb532b4]
+2025-03-18T17:33:45.810+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-03-18T17:33:46.323+02:00 DEBUG 12704 --- [http-nio-8080-exec-9] o.s.security.web.FilterChainProxy        : Securing GET /api/users/me
+2025-03-18T17:33:46.669+02:00  INFO 12704 --- [http-nio-8080-exec-9] com.flawlessyou.backend.config.GetUser   : User role: USER
+2025-03-18T17:33:46.692+02:00 DEBUG 12704 --- [http-nio-8080-exec-9] o.s.security.web.FilterChainProxy        : Secured GET /api/users/me
+2025-03-18T17:33:46.693+02:00 DEBUG 12704 --- [http-nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : GET "/api/users/me", parameters={}
+2025-03-18T17:33:46.694+02:00 DEBUG 12704 --- [http-nio-8080-exec-9] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.flawlessyou.backend.controllers.UserController#getCurrentUser(HttpServletRequest)
+2025-03-18T17:33:46.713+02:00  INFO 12704 --- [http-nio-8080-exec-9] com.flawlessyou.backend.config.GetUser   : Roles from token: [ROLE_USER]
+2025-03-18T17:33:47.136+02:00 DEBUG 12704 --- [http-nio-8080-exec-9] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+2025-03-18T17:33:47.140+02:00 DEBUG 12704 --- [http-nio-8080-exec-9] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [com.flawlessyou.backend.entity.user.User@6645532a]
+2025-03-18T17:33:47.147+02:00 DEBUG 12704 --- [http-nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-03-18T17:39:54.448+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/signup
+2025-03-18T17:39:54.453+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T17:39:54.454+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/signup
+2025-03-18T17:39:54.456+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : POST "/api/auth/signup", parameters={}
+2025-03-18T17:39:54.457+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.flawlessyou.backend.controllers.AuthController#registerUser(SignupRequest)
+2025-03-18T17:39:54.464+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=utf-8" to [com.flawlessyou.backend.Payload.Request.SignupRequest@402d6549]
+2025-03-18T17:39:56.391+02:00  INFO 12704 --- [http-nio-8080-exec-2] c.f.backend.controllers.AuthController   : Encoded password: $2a$10$A/nSlbUcfFnqOuXKWInrdOIlh/7m.LgDQ6XhMKL9lhs.Cap72VwzW
+2025-03-18T17:39:56.806+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+2025-03-18T17:39:56.807+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [com.flawlessyou.backend.Payload.Response.MessageResponse@3194a76f]
+2025-03-18T17:39:56.810+02:00 DEBUG 12704 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-03-18T17:39:56.886+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/signin
+2025-03-18T17:39:56.888+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-03-18T17:39:56.890+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/signin
+2025-03-18T17:39:56.891+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : POST "/api/auth/signin", parameters={}
+2025-03-18T17:39:56.892+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.flawlessyou.backend.controllers.AuthController#authenticateUser(LoginRequest)
+2025-03-18T17:39:56.896+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=utf-8" to [com.flawlessyou.backend.Payload.Request.LoginRequest@1cdd8e87]
+2025-03-18T17:39:57.192+02:00  INFO 12704 --- [http-nio-8080-exec-1] com.flawlessyou.backend.config.GetUser   : User role: USER
+2025-03-18T17:39:57.366+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.s.a.dao.DaoAuthenticationProvider    : Authenticated user
+2025-03-18T17:39:57.373+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+2025-03-18T17:39:57.375+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [com.flawlessyou.backend.Payload.Response.JwtResponse@641f8411]
+2025-03-18T17:39:57.376+02:00 DEBUG 12704 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-03-18T17:39:57.408+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Securing GET /api/users/me
+2025-03-18T17:39:57.742+02:00  INFO 12704 --- [http-nio-8080-exec-4] com.flawlessyou.backend.config.GetUser   : User role: USER
+2025-03-18T17:39:57.759+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Secured GET /api/users/me
+2025-03-18T17:39:57.760+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : GET "/api/users/me", parameters={}
+2025-03-18T17:39:57.763+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.flawlessyou.backend.controllers.UserController#getCurrentUser(HttpServletRequest)
+2025-03-18T17:39:57.793+02:00  INFO 12704 --- [http-nio-8080-exec-4] com.flawlessyou.backend.config.GetUser   : Roles from token: [ROLE_USER]
+2025-03-18T17:39:58.213+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+2025-03-18T17:39:58.214+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [com.flawlessyou.backend.entity.user.User@75e74a9f]
+2025-03-18T17:39:58.216+02:00 DEBUG 12704 --- [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-03-18T17:39:58.985+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Securing GET /product/Saved
+2025-03-18T17:39:59.373+02:00  INFO 12704 --- [http-nio-8080-exec-6] com.flawlessyou.backend.config.GetUser   : User role: USER
+2025-03-18T17:39:59.375+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Secured GET /product/Saved
+2025-03-18T17:39:59.376+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : GET "/product/Saved", parameters={}
+2025-03-18T17:39:59.377+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.flawlessyou.backend.controllers.ProductController#getSavedProduct(HttpServletRequest)
+2025-03-18T17:39:59.443+02:00  INFO 12704 --- [http-nio-8080-exec-6] com.flawlessyou.backend.config.GetUser   : Roles from token: [ROLE_USER]
+2025-03-18T17:40:00.508+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+2025-03-18T17:40:00.513+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [[]]
+2025-03-18T17:40:00.517+02:00 DEBUG 12704 --- [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
