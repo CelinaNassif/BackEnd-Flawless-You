@@ -60,7 +60,7 @@ public class RoutineController {
     //     }
     // }
     @GetMapping("/userRoutine")
-    public Routine getAllRoutinesForUser(HttpServletRequest request) throws  Exception {
+    public ResponseEntity<Routine> getAllRoutinesForUser(HttpServletRequest request) throws  Exception {
      return routineService.getRoutineUser(request);
     }
 
