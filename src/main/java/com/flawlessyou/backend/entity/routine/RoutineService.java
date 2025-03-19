@@ -7,7 +7,10 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import jakarta.servlet.http.HttpServletRequest;
+
+import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.sql.Timestamp; // استيراد الفئة
 import java.util.ArrayList;
@@ -83,8 +86,16 @@ public class RoutineService {
     }
 
 
-    public Routine getRoutineUser(HttpServletRequest request) throws Exception {
-      
+    public ResponseEntity<Routine> getRoutineUser(HttpServletRequest request) {
+        try {
+            Routine routine = getRoutineUserInternal(request);
+            return ResponseEntity.ok(routine);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    private Routine getRoutineUserInternal(HttpServletRequest request) throws Exception {
         String userId = getUser.userFromToken(request).getUserId();
         CollectionReference routinesRef = firestore.collection("routines");
         Query query = routinesRef.whereEqualTo("userId", userId);
@@ -98,6 +109,8 @@ public class RoutineService {
             throw new Exception("No routine found for the given user ID");
         }
     }
+
+    
     // public String getAnalysisById(String analysisId) throws ExecutionException, InterruptedException {
     //     DocumentReference docRef = firestore.collection("analyses").document(analysisId);
     //     ApiFuture<DocumentSnapshot> future = docRef.get();
@@ -111,60 +124,67 @@ public class RoutineService {
  
 
 
-
     public Map<RoutineTime, List<Product>> getRoutineWithProductsByTime(HttpServletRequest request) throws Exception {
-        User user = getUser.userFromToken(request);
-        String routineId = user.getRoutineId();
-        
-        if (routineId == null || routineId.isEmpty()) {
-            throw new IllegalArgumentException("Routine ID must be a non-empty string.");
-        }
-        
-        // استرجاع الروتين من Firestore
-        Routine routine = getRoutineById(routineId);
-        if (routine == null) {
-            throw new RuntimeException("Routine not found with ID: " + routineId);
-        }
-        
-        // استرجاع جميع المنتجات من Firestore
-        CollectionReference productsRef = firestore.collection("products");
-        ApiFuture<QuerySnapshot> productsFuture = productsRef.get();
-        List<QueryDocumentSnapshot> productDocuments = productsFuture.get().getDocuments();
-        
-        // إنشاء Map لتخزين المنتجات المصنفة حسب الوقت
-        Map<RoutineTime, List<Product>> productsByTime = new EnumMap<>(RoutineTime.class);
-        productsByTime.put(RoutineTime.MORNING, new ArrayList<>());
-        productsByTime.put(RoutineTime.AFTERNOON, new ArrayList<>());
-        productsByTime.put(RoutineTime.NIGHT, new ArrayList<>());
-        
-        // تصنيف المنتجات حسب الوقت
-        for (QueryDocumentSnapshot productDocument : productDocuments) {
-            Product product = productDocument.toObject(Product.class);
-            if (routine.getProductIds().contains(product.getProductId())) {
-                List<RoutineTime> usageTimes = product.getUsageTime();
-                if (usageTimes != null) {
-                    for (RoutineTime time : usageTimes) {
-                        switch (time) {
-                            case MORNING:
-                                productsByTime.get(RoutineTime.MORNING).add(product);
-                                break;
-                            case AFTERNOON:
-                                productsByTime.get(RoutineTime.AFTERNOON).add(product);
-                                break;
-                            case NIGHT:
-                                productsByTime.get(RoutineTime.NIGHT).add(product);
-                                break;
+    
+        try {
+            // Retrieve user from token
+            User user = getUser.userFromToken(request);
+            if (user == null) {
+                throw new IllegalArgumentException("User not found or invalid token.");
+            }
+    
+            String routineId = user.getRoutineId();
+            if (routineId == null || routineId.isEmpty()) {
+                throw new IllegalArgumentException("Routine ID must be a non-empty string.");
+            }
+    
+            // Retrieve routine from Firestore
+            Routine routine = getRoutineById(routineId);
+            if (routine == null) {
+                throw new RuntimeException("Routine not found with ID: " + routineId);
+            }
+    
+            // Retrieve all products from Firestore
+            CollectionReference productsRef = firestore.collection("products");
+            ApiFuture<QuerySnapshot> productsFuture = productsRef.get();
+            List<QueryDocumentSnapshot> productDocuments = productsFuture.get().getDocuments();
+    
+            // Create a map to store products categorized by time
+            Map<RoutineTime, List<Product>> productsByTime = new EnumMap<>(RoutineTime.class);
+            productsByTime.put(RoutineTime.MORNING, new ArrayList<>());
+            productsByTime.put(RoutineTime.AFTERNOON, new ArrayList<>());
+            productsByTime.put(RoutineTime.NIGHT, new ArrayList<>());
+    
+            // Categorize products by time
+            for (QueryDocumentSnapshot productDocument : productDocuments) {
+                Product product = productDocument.toObject(Product.class);
+                if (routine.getProductIds() != null && routine.getProductIds().contains(product.getProductId())) {
+                    List<RoutineTime> usageTimes = product.getUsageTime();
+                    if (usageTimes != null) {
+                        for (RoutineTime time : usageTimes) {
+                            switch (time) {
+                                case MORNING:
+                                    productsByTime.get(RoutineTime.MORNING).add(product);
+                                    break;
+                                case AFTERNOON:
+                                    productsByTime.get(RoutineTime.AFTERNOON).add(product);
+                                    break;
+                                case NIGHT:
+                                    productsByTime.get(RoutineTime.NIGHT).add(product);
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
                     }
                 }
             }
+    
+            return productsByTime;
+        } catch (Exception e) {
+            throw e; // Re-throw the exception to propagate it
         }
-        
-        // إرجاع Map يحتوي على المنتجات المصنفة حسب الوقت
-        return productsByTime;
     }
-
-
 
 
 

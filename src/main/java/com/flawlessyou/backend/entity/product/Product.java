@@ -17,17 +17,19 @@ public class Product {
     private String name;
     private List<Type> skinType;
     private String description;
+    private String smaledescription;
     private List<String> ingredients;
     private String adminId;// هاد اليوزر الي ضاف البرودكت 
     private List<String> photos;
     private Map<String, Integer> reviews;
     private List<RoutineTime> usageTime;
-    public Product(String name, List<Type> skinType, String description, List<String> ingredients
+    public Product(String name, List<Type> skinType, String description, List<String> ingredients, String smaledescription
 ) {
         this.name = name;
         this.skinType = skinType;
         this.description = description;
         this.ingredients = ingredients;
+        this.smaledescription =smaledescription;
   
       
         
@@ -88,6 +90,14 @@ public class Product {
 
     public void setUsageTime(List<RoutineTime> usageTime) {
         this.usageTime = usageTime;
+    }
+
+    public String getSmaledescription() {
+        return smaledescription;
+    }
+
+    public void setSmaledescription(String smaledescription) {
+        this.smaledescription = smaledescription;
     }
 
     
