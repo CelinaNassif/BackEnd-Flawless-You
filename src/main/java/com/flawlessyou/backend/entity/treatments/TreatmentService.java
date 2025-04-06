@@ -1,7 +1,9 @@
 package com.flawlessyou.backend.entity.treatments;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,68 +117,65 @@ public class TreatmentService {
     }
 
     public List<Product> getProductsForTreatment(String treatmentId) throws ExecutionException, InterruptedException {
-    // 1. الحصول على العلاج بواسطة الـ treatmentId
-    Treatment treatment = getTreatment(treatmentId);
-    if (treatment == null) {
-        throw new RuntimeException("Treatment not found with ID: " + treatmentId);
-    }
-
-    // 2. الحصول على قائمة productIds من العلاج
-    List<String> productIds = treatment.getProductIds();
-    if (productIds == null || productIds.isEmpty()) {
-        return new ArrayList<>(); // إرجاع قائمة فارغة إذا لم يكن هناك منتجات
-    }
-
-    // 3. جلب المنتجات من Firestore بناءً على productIds
-    List<Product> products = new ArrayList<>();
-    for (String productId : productIds) {
-        DocumentReference docRef = firestore.collection("products").document(productId);
-        ApiFuture<DocumentSnapshot> future = docRef.get();
-        DocumentSnapshot document = future.get();
-
-        if (document.exists()) {
-            products.add(document.toObject(Product.class));
+        // 1. Get treatment by treatmentId
+        Treatment treatment = getTreatment(treatmentId);
+        if (treatment == null) {
+            throw new RuntimeException("Treatment not found with ID: " + treatmentId);
         }
+    
+        // 2. Get productIds map from treatment
+        Map<String, String> productIds = treatment.getProductIds();
+        if (productIds == null || productIds.isEmpty()) {
+            return new ArrayList<>(); // Return empty list if no products
+        }
+    
+        // 3. Fetch products from Firestore based on productIds (map keys)
+        List<Product> products = new ArrayList<>();
+        for (String productId : productIds.keySet()) {  // Iterate through map keys
+            DocumentReference docRef = firestore.collection("products").document(productId);
+            ApiFuture<DocumentSnapshot> future = docRef.get();
+            DocumentSnapshot document = future.get();
+    
+            if (document.exists()) {
+                products.add(document.toObject(Product.class));
+            }
+        }
+    
+        return products;
     }
-
-    return products;
-}
-
-
-public String addProductToTreatment(String treatmentId, String productId) throws ExecutionException, InterruptedException {
+public String addProductToTreatment(String treatmentId, String productId, String productName) throws ExecutionException, InterruptedException {
     Treatment treatment = getTreatment(treatmentId);
     if (treatment == null) {
         throw new RuntimeException("Treatment not found with ID: " + treatmentId);
     }
 
-    List<String> productIds = treatment.getProductIds();
+    Map<String, String> productIds = treatment.getProductIds();
     if (productIds == null) {
-        productIds = new ArrayList<>();
+        productIds = new HashMap<>(); // Initialize as HashMap instead of ArrayList
     }
 
-    if (!productIds.contains(productId)) {
-        productIds.add(productId);
+    // Put the productId as key and productName as value in the map
+    if (!productIds.containsKey(productId)) {
+        productIds.put(productId, productName);
         treatment.setProductIds(productIds);
     }
 
     ApiFuture<WriteResult> future = firestore.collection(COLLECTION_NAME).document(treatmentId).set(treatment);
     return future.get().getUpdateTime().toString();
 }
-
 public String removeProductFromTreatment(String treatmentId, String productId) throws ExecutionException, InterruptedException {
     Treatment treatment = getTreatment(treatmentId);
     if (treatment == null) {
         throw new RuntimeException("Treatment not found with ID: " + treatmentId);
     }
 
-    List<String> productIds = treatment.getProductIds();
-    if (productIds != null && productIds.contains(productId)) {
-        productIds.remove(productId);
+    Map<String, String> productIds = treatment.getProductIds();
+    if (productIds != null && productIds.containsKey(productId)) {
+        productIds.remove(productId);  // Remove by key from the map
         treatment.setProductIds(productIds);
     }
 
     ApiFuture<WriteResult> future = firestore.collection(COLLECTION_NAME).document(treatmentId).set(treatment);
     return future.get().getUpdateTime().toString();
 }
-
 }

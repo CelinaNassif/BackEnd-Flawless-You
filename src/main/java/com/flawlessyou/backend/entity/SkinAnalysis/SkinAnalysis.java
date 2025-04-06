@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.Date;
 
 import com.flawlessyou.backend.entity.product.Type;
 import com.flawlessyou.backend.entity.treatments.Problem;
@@ -13,26 +14,29 @@ public class SkinAnalysis {
     private String id;
     private String userId;
     private Type skintype;
-    private Map<String, Double> problems; // تم تغيير النوع إلى Map<String, Double>
+    private Map<String, Double> problems;
     private List<Treatment> treatmentId;
     private String imageUrl;
+    private Date createdAt; // Added timestamp field
 
     // Constructor
     public SkinAnalysis(String userId, Type skintype, Map<Problem, Double> problems) {
         this.userId = userId;
         this.id = UUID.randomUUID().toString();
         this.skintype = skintype;
-        this.problems = convertProblemsMap(problems); // تحويل Map<Problem, Double> إلى Map<String, Double>
+        this.problems = convertProblemsMap(problems);
+        this.createdAt = new Date(); // Set creation time when object is created
     }
 
     public SkinAnalysis() {
+        this.createdAt = new Date(); // Also set in default constructor
     }
 
     // طريقة لتحويل Map<Problem, Double> إلى Map<String, Double>
     private Map<String, Double> convertProblemsMap(Map<Problem, Double> problems) {
         return problems.entrySet().stream()
                 .collect(Collectors.toMap(
-                        entry -> entry.getKey().name(), // تحويل Enum إلى String
+                        entry -> entry.getKey().name(),
                         Map.Entry::getValue
                 ));
     }
@@ -84,5 +88,14 @@ public class SkinAnalysis {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    // Timestamp getter and setter
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 }

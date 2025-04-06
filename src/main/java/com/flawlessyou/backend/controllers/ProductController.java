@@ -58,7 +58,20 @@ public class ProductController {
     @Autowired
  private GetUser getUser ;
 
-    
+        
+ @GetMapping("/{productId}")
+ public ResponseEntity<Product> getProductById(@PathVariable String productId) {
+     try {
+         Product product = productService.getProductById(productId);
+         if (product != null) {
+             return ResponseEntity.ok(product);
+         } else {
+             return ResponseEntity.notFound().build();
+         }
+     } catch (ExecutionException | InterruptedException e) {
+         return ResponseEntity.internalServerError().build();
+     }
+ }
 
 @GetMapping("/random")
 public ResponseEntity<?> getRandomProducts(

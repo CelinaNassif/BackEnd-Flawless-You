@@ -60,9 +60,9 @@ public List<Product> getProductsForTreatment(@PathVariable String treatmentId) t
     return treatmentService.getProductsForTreatment(treatmentId);
 }
 
-@PostMapping("/{treatmentId}/products/{productId}")
-public String addProductToTreatment(@PathVariable String treatmentId, @PathVariable String productId) throws ExecutionException, InterruptedException {
-    return treatmentService.addProductToTreatment(treatmentId, productId);
+@PostMapping("/{treatmentId}/products/{productId}/{productName}")
+public String addProductToTreatment(@PathVariable String treatmentId, @PathVariable String productId, @PathVariable String productName) throws ExecutionException, InterruptedException {
+    return treatmentService.addProductToTreatment(treatmentId, productId,productName);
 }
 
 @DeleteMapping("/{treatmentId}/products/{productId}")

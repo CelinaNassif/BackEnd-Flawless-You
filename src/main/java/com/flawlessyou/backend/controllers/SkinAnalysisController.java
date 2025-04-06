@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/skin-analysis")
@@ -29,7 +30,15 @@ public class SkinAnalysisController {
     @Autowired
     private SkinAnalysisService skinAnalysisService;
 
-
+    @GetMapping("/user")
+    public List<SkinAnalysis> getAllSkinAnalysesByUserId( HttpServletRequest request) throws Exception, InterruptedException {
+    
+        User user = getUser.userFromToken(request);
+        if (user == null || user.getUserId() == null || user.getUserId().isEmpty()) {
+            throw new IllegalArgumentException("Invalid user or user ID.");
+        }
+            return skinAnalysisService.getAllSkinAnalysesByUserId(user.getUserId());
+    }
     @PostMapping("/recommend-treatments")
     public SkinAnalysis recommendTreatments(
             @RequestParam Type skinType,
