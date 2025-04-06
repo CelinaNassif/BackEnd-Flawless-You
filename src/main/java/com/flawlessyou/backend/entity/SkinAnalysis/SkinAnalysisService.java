@@ -28,6 +28,31 @@ public class SkinAnalysisService {
     @Autowired
     private Firestore firestore;
 
+
+    public List<SkinAnalysis> getAllSkinAnalysesByUserId(String userId) throws ExecutionException, InterruptedException {
+        try {
+            // 1. إنشاء الاستعلام للحصول على جميع تحاليل الجلد للمستخدم
+            ApiFuture<QuerySnapshot> future = firestore.collection("skinAnalysis")
+                    .whereEqualTo("userId", userId)
+                    .get();
+    
+            // 2. انتظار نتيجة الاستعلام
+            QuerySnapshot querySnapshot = future.get();
+    
+            // 3. تحويل النتائج إلى قائمة من SkinAnalysis
+            List<SkinAnalysis> skinAnalyses = new ArrayList<>();
+            for (QueryDocumentSnapshot document : querySnapshot.getDocuments()) {
+                SkinAnalysis skinAnalysis = document.toObject(SkinAnalysis.class);
+                skinAnalyses.add(skinAnalysis);
+            }
+    
+            logger.info("Retrieved " + skinAnalyses.size() + " skin analyses for user ID: " + userId);
+            return skinAnalyses;
+        } catch (Exception e) {
+            logger.severe("Error getting skin analyses for user ID " + userId + ": " + e.getMessage());
+            throw e;
+        }
+    }
     public SkinAnalysis getRecommendedTreatments(String userId, Type skinType, Map<Problem, Double> problems) throws ExecutionException, InterruptedException {
         try {
             // Step 1: Create a SkinAnalysis object
@@ -147,11 +172,11 @@ public class SkinAnalysisService {
         // 4. جمع جميع productIds من Treatments وتجميعها حسب المشكلة
         for (Treatment treatment : treatments) {
             String problem = treatment.getProblem().name();
-            List<String> productIds = treatment.getProductIds();
+            Map<String ,String> productIds = treatment.getProductIds();
     
             // 5. استرداد تفاصيل المنتجات من Firestore باستخدام productIds
             List<Product> products = new ArrayList<>();
-            for (String productId : productIds) {
+            for (String productId : productIds.keySet()) {
                 DocumentReference productRef = firestore.collection("products").document(productId);
                 ApiFuture<DocumentSnapshot> productFuture = productRef.get();
                 DocumentSnapshot productDoc = productFuture.get();

@@ -1,6 +1,7 @@
 package com.flawlessyou.backend.entity.treatments;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.flawlessyou.backend.entity.product.Type;
@@ -11,10 +12,10 @@ public class Treatment {
     private Type skinType;
     private String description;
     private Problem problem;
-    private List<String> productIds;
+    private Map<String ,String> productIds;
    
    
-    public Treatment( Type skinType, String description, List<String> productIds,Problem problem) {
+    public Treatment( Type skinType, String description, Map<String ,String> productIds,Problem problem) {
         this.treatmentId = UUID.randomUUID().toString();
         this.skinType = skinType;
         this.description = description;
@@ -47,11 +48,11 @@ public class Treatment {
     public void setdescription(String description) {
         this.description = description;
     }
-    public List<String> getProductIds() {
+    public Map<String, String> getProductIds() {
         return productIds;
     }
-    public void setProductIds(List<String> productIds) {
-        this.productIds = productIds;
+    public void setProductIds(Map<String, String> productIds2 ) {
+        this.productIds = productIds2;
     }
 
     public Problem getProblem() {
