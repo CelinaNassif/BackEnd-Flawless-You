@@ -5,7 +5,8 @@ import com.flawlessyou.backend.entity.product.Product;
 import com.flawlessyou.backend.entity.routine.Routine;
 import com.flawlessyou.backend.entity.routine.RoutineService;
 import com.flawlessyou.backend.entity.routine.RoutineTime;
-
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,9 @@ public class RoutineController {
 
     @Autowired
     private RoutineService routineService;
-
-    @PostMapping("/create")
+  
+    @PostMapping("/create") 
+    // @CacheEvict(value = "routineProducts", key = "#request.getAttribute('userId')")
     public ResponseEntity<Routine> createRoutine(HttpServletRequest request,
                                  @RequestBody Routine routine) throws Exception {
         return ResponseEntity.ok(routineService.createRoutine(request, routine)) ;
@@ -66,6 +68,7 @@ public class RoutineController {
 
 
 @GetMapping("/by-time")
+// @Cacheable(value = "routineProducts", key = "#request.getAttribute('userId')")
     public Map<RoutineTime, List<Product>> getRoutineWithProductsByTime(HttpServletRequest request) throws Exception {
        
         return routineService.getRoutineWithProductsByTime(request);

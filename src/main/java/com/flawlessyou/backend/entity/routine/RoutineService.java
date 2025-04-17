@@ -124,69 +124,139 @@ public class RoutineService {
  
 
 
-    public Map<RoutineTime, List<Product>> getRoutineWithProductsByTime(HttpServletRequest request) throws Exception {
+//    public Map<RoutineTime, List<Product>> getRoutineWithProductsByTime(HttpServletRequest request) throws Exception {
+//     // 1. التحقق من المستخدم والروتين
+//     User user = getUser.userFromToken(request);
+//     if (user == null) throw new IllegalArgumentException("User not found or invalid token.");
     
-        try {
-            // Retrieve user from token
-            User user = getUser.userFromToken(request);
-            if (user == null) {
-                throw new IllegalArgumentException("User not found or invalid token.");
-            }
+//     String routineId = user.getRoutineId();
+//     if (routineId == null || routineId.isEmpty()) {
+//         throw new IllegalArgumentException("Routine ID must be a non-empty string.");
+//     }
+
+//     // 2. جلب الروتين (مخزن مؤقت إذا أمكن)
+//     Routine routine = getRoutineById(routineId);
+//     if (routine == null) throw new RuntimeException("Routine not found with ID: " + routineId);
     
-            String routineId = user.getRoutineId();
-            if (routineId == null || routineId.isEmpty()) {
-                throw new IllegalArgumentException("Routine ID must be a non-empty string.");
-            }
+//     if (routine.getProductIds() == null || routine.getProductIds().isEmpty()) {
+//         return initializeEmptyTimeMap();
+//     }
+
+//     // 3. جلب المنتجات في استعلام واحد مع التجميع
+//     List<ApiFuture<QuerySnapshot>> futures = new ArrayList<>();
+//     Map<RoutineTime, List<Product>> result = new EnumMap<>(RoutineTime.class);
     
-            // Retrieve routine from Firestore
-            Routine routine = getRoutineById(routineId);
-            if (routine == null) {
-                throw new RuntimeException("Routine not found with ID: " + routineId);
-            }
-    
-            // Retrieve all products from Firestore
-            CollectionReference productsRef = firestore.collection("products");
-            ApiFuture<QuerySnapshot> productsFuture = productsRef.get();
-            List<QueryDocumentSnapshot> productDocuments = productsFuture.get().getDocuments();
-    
-            // Create a map to store products categorized by time
-            Map<RoutineTime, List<Product>> productsByTime = new EnumMap<>(RoutineTime.class);
-            productsByTime.put(RoutineTime.MORNING, new ArrayList<>());
-            productsByTime.put(RoutineTime.AFTERNOON, new ArrayList<>());
-            productsByTime.put(RoutineTime.NIGHT, new ArrayList<>());
-    
-            // Categorize products by time
-            for (QueryDocumentSnapshot productDocument : productDocuments) {
-                Product product = productDocument.toObject(Product.class);
-                if (routine.getProductIds() != null && routine.getProductIds().contains(product.getProductId())) {
-                    List<RoutineTime> usageTimes = product.getUsageTime();
-                    if (usageTimes != null) {
-                        for (RoutineTime time : usageTimes) {
-                            switch (time) {
-                                case MORNING:
-                                    productsByTime.get(RoutineTime.MORNING).add(product);
-                                    break;
-                                case AFTERNOON:
-                                    productsByTime.get(RoutineTime.AFTERNOON).add(product);
-                                    break;
-                                case NIGHT:
-                                    productsByTime.get(RoutineTime.NIGHT).add(product);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
+//     for (RoutineTime time : RoutineTime.values()) {
+//         result.put(time, new ArrayList<>());
+        
+//         // إنشاء استعلام لكل وقت استخدام
+//         Query query = firestore.collection("products")
+//             .whereIn("productId", routine.getProductIds())
+//             .whereArrayContains("usageTime", time);
+        
+//         futures.add(query.get());
+//     }
+
+//     // 4. معالجة النتائج بشكل متوازي
+//     for (int i = 0; i < futures.size(); i++) {
+//         RoutineTime time = RoutineTime.values()[i];
+//         List<QueryDocumentSnapshot> docs = futures.get(i).get().getDocuments();
+        
+//         for (QueryDocumentSnapshot doc : docs) {
+//             result.get(time).add(doc.toObject(Product.class));
+//         }
+//     }
+
+//     return result;
+// }
+
+// private Map<RoutineTime, List<Product>> initializeEmptyTimeMap() {
+//     Map<RoutineTime, List<Product>> map = new EnumMap<>(RoutineTime.class);
+//     for (RoutineTime time : RoutineTime.values()) {
+//         map.put(time, new ArrayList<>());
+//     }
+//     return map;
+// }
+
+
+
+
+
+
+public Map<RoutineTime, List<Product>> getRoutineWithProductsByTime(HttpServletRequest request) throws Exception {
+    try {
+        // 1. التحقق من المستخدم - O(1)
+        User user = getUser.userFromToken(request);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found or invalid token.");
+        }
+
+        // 2. التحقق من وجود الروتين - O(1)
+        String routineId = user.getRoutineId();
+        if (routineId == null || routineId.isEmpty()) {
+            throw new IllegalArgumentException("Routine ID must be a non-empty string.");
+        }
+
+        // 3. جلب الروتين - O(1) (يفترض وجود cache)
+        Routine routine = getRoutineById(routineId);
+        if (routine == null) {
+            throw new RuntimeException("Routine not found with ID: " + routineId);
+        }
+
+        // 4. التحقق من وجود منتجات - O(1)
+        if (routine.getProductIds() == null || routine.getProductIds().isEmpty()) {
+            return initializeEmptyTimeMap();
+        }
+
+        // 5. تقسيم المنتجات إلى مجموعات لتجنب حدود Firestore (10 لكل مجموعة)
+        List<List<String>> productIdBatches = partitionList(routine.getProductIds(), 10);
+
+        // 6. تنفيذ استعلامات متوازية لكل مجموعة
+        List<ApiFuture<QuerySnapshot>> futures = new ArrayList<>();
+        for (List<String> batch : productIdBatches) {
+            Query query = firestore.collection("products")
+                .whereIn("productId", batch);
+            futures.add(query.get());
+        }
+
+        // 7. معالجة النتائج وتصنيفها حسب الوقت
+        Map<RoutineTime, List<Product>> productsByTime = initializeEmptyTimeMap();
+        
+        for (ApiFuture<QuerySnapshot> future : futures) {
+            List<QueryDocumentSnapshot> productDocuments = future.get().getDocuments();
+            
+            for (QueryDocumentSnapshot doc : productDocuments) {
+                Product product = doc.toObject(Product.class);
+                if (product.getUsageTime() != null) {
+                    for (RoutineTime time : product.getUsageTime()) {
+                        productsByTime.get(time).add(product);
                     }
                 }
             }
-    
-            return productsByTime;
-        } catch (Exception e) {
-            throw e; // Re-throw the exception to propagate it
         }
+
+        return productsByTime;
+    } catch (Exception e) {
+        throw e;
     }
+}
 
+// دالة مساعدة لتهيئة خريطة الأوقات الفارغة
+private Map<RoutineTime, List<Product>> initializeEmptyTimeMap() {
+    Map<RoutineTime, List<Product>> map = new EnumMap<>(RoutineTime.class);
+    for (RoutineTime time : RoutineTime.values()) {
+        map.put(time, new ArrayList<>());
+    }
+    return map;
+}
 
-
+// دالة مساعدة لتقسيم القوائم
+private <T> List<List<T>> partitionList(List<T> list, int batchSize) {
+    List<List<T>> batches = new ArrayList<>();
+    for (int i = 0; i < list.size(); i += batchSize) {
+        batches.add(list.subList(i, Math.min(i + batchSize, list.size())));
+    }
+    return batches;
+}
 
 }
