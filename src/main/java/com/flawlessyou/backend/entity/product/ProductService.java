@@ -1,5 +1,6 @@
 package com.flawlessyou.backend.entity.product;
 
+import com.flawlessyou.backend.entity.user.User;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 
@@ -69,21 +70,38 @@ public class ProductService {
 }
 
 
-public List<Product> getRandomProducts(int limit) throws ExecutionException, InterruptedException {
-    Query query = firestore.collection(COLLECTION_NAME)
-            .limit(limit); 
+// public List<Product> getRandomProducts(int limit) throws ExecutionException, InterruptedException {
+//     Query query = firestore.collection(COLLECTION_NAME)
+//             .limit(limit); 
 
+//     ApiFuture<QuerySnapshot> future = query.get();
+//     List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+//     List<Product> randomProducts = new ArrayList<>();
+//     for (QueryDocumentSnapshot document : documents) {
+//         randomProducts.add(document.toObject(Product.class));
+//     }
+
+//     return randomProducts;
+// }
+public List<ProductWithSaveStatusDTO> getRandomProductsWithSaveStatus(int limit, User user) 
+    throws ExecutionException, InterruptedException {
+    
+    Query query = firestore.collection(COLLECTION_NAME).limit(limit); 
     ApiFuture<QuerySnapshot> future = query.get();
     List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
-    List<Product> randomProducts = new ArrayList<>();
+    List<ProductWithSaveStatusDTO> result = new ArrayList<>();
+    List<String> savedProductIds = user != null ? user.getSavedProductIds() : Collections.emptyList();
+
     for (QueryDocumentSnapshot document : documents) {
-        randomProducts.add(document.toObject(Product.class));
+        Product product = document.toObject(Product.class);
+        boolean isSaved = savedProductIds.contains(product.getProductId()); 
+        result.add(new ProductWithSaveStatusDTO(product, isSaved));
     }
 
-    return randomProducts;
+    return result;
 }
-
 public Product updateProduct(Product product) throws ExecutionException, InterruptedException {
     if (product.getProductId() == null || product.getProductId().isEmpty()) {
         throw new IllegalArgumentException("Product ID cannot be null or empty");

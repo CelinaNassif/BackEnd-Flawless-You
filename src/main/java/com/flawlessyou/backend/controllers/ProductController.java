@@ -34,6 +34,7 @@ import com.flawlessyou.backend.entity.cloudinary.CloudinaryResponse;
 import com.flawlessyou.backend.entity.cloudinary.CloudinaryService;
 import com.flawlessyou.backend.entity.product.Product;
 import com.flawlessyou.backend.entity.product.ProductService;
+import com.flawlessyou.backend.entity.product.ProductWithSaveStatusDTO;
 import com.flawlessyou.backend.entity.user.User;
 import com.flawlessyou.backend.util.FileUploadUtil;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -75,9 +76,13 @@ public class ProductController {
 
 @GetMapping("/random")
 public ResponseEntity<?> getRandomProducts(
-        @RequestParam(defaultValue = "6") int limit) { 
+        @RequestParam(defaultValue = "6") int limit,  HttpServletRequest request) { 
     try {
-        List<Product> randomProducts = productService.getRandomProducts(limit);
+        User admin = getUser.userFromToken(request);
+        if (admin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+        List<ProductWithSaveStatusDTO> randomProducts = productService.getRandomProductsWithSaveStatus(limit,admin);
         return ResponseEntity.ok(randomProducts);
     } catch (Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
