@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +68,7 @@ public class ProductController {
          } else {
              return ResponseEntity.notFound().build();
          }
-     } catch (ExecutionException | InterruptedException e) {
+     } catch (Exception e) {
          return ResponseEntity.internalServerError().build();
      }
  }
@@ -300,7 +299,7 @@ public ResponseEntity<?> getRandomProducts(
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
             }
 
-            List<Product> Saved = productService.getSavedProducts(user.getUserId());
+            List<ProductWithSaveStatusDTO> Saved = productService.getSavedProducts(user.getUserId());
 
             return ResponseEntity.ok(Saved);
 
@@ -393,15 +392,25 @@ public ResponseEntity<?> getRandomProducts(
 //             .filter(product -> product.getName().toLowerCase().contains(name.toLowerCase()))
 //             .collect(Collectors.toList());
 // }
-
 @GetMapping("/search")
-public List<Product> searchProductsByName(@RequestParam String name) throws ExecutionException, InterruptedException {
+public List<ProductWithSaveStatusDTO> searchProductsByName(
+        @RequestParam String name,HttpServletRequest request
+      ) throws Exception {
+    
+            User user = getUser.userFromToken(request);
+       
     if (name == null || name.trim().isEmpty()) {
-        return productService.getAllProducts(); // or return an empty list, depending on your requirements
+        // إذا كان البحث فارغاً، نعيد كل المنتجات مع حالة الحفظ
+        return productService.getAllProducts().stream()
+                .map(product -> new ProductWithSaveStatusDTO(
+                        product, 
+                        user != null && user.getSavedProductIds().contains(product.getProductId())
+                ))
+                .collect(Collectors.toList());
     }
-    return productService.getAllProducts().stream()
-            .filter(product -> product.getName() != null && product.getName().toLowerCase().contains(name.toLowerCase()))
-            .collect(Collectors.toList());
+    
+    // البحث باستخدام خدمة المنتجات مع تضمين حالة الحفظ
+    return productService.searchProductsByName(name, user);
 }
 
 
