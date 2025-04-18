@@ -219,7 +219,7 @@ return savedProductIds.contains(productId);
 
 
 
-public List<Product> getSavedProducts(String userId) throws ExecutionException, InterruptedException {
+public List<ProductWithSaveStatusDTO> getSavedProducts(String userId) throws ExecutionException, InterruptedException {
     DocumentReference userRef = firestore.collection(USERS_COLLECTION).document(userId);
     DocumentSnapshot userSnapshot = userRef.get().get();
     
@@ -229,21 +229,20 @@ public List<Product> getSavedProducts(String userId) throws ExecutionException, 
         return Collections.emptyList(); 
     }
     
-    List<Product> savedProducts = new ArrayList<>();
+    List<ProductWithSaveStatusDTO> result = new ArrayList<>();
     
     for (String productId : savedProductIds) {
         DocumentReference productRef = firestore.collection(COLLECTION_NAME).document(productId);
         DocumentSnapshot productSnapshot = productRef.get().get();
         
         if (productSnapshot.exists()) {
-            savedProducts.add(productSnapshot.toObject(Product.class));
+            Product product = productSnapshot.toObject(Product.class);
+            result.add(new ProductWithSaveStatusDTO(product, true));
         }
     }
     
-    return savedProducts;
+    return result;
 }
-
-
 
 
 
@@ -302,7 +301,8 @@ public void deleteProduct(String productId) throws ExecutionException, Interrupt
 
 
 
-public List<Product> searchProductsByName(String searchTerm) throws ExecutionException, InterruptedException {
+public List<ProductWithSaveStatusDTO> searchProductsByName(String searchTerm, User user) 
+    throws ExecutionException, InterruptedException {
 
     String lowerCaseSearchTerm = searchTerm.toLowerCase();
 
@@ -310,20 +310,20 @@ public List<Product> searchProductsByName(String searchTerm) throws ExecutionExc
             .whereGreaterThanOrEqualTo("name", lowerCaseSearchTerm)
             .whereLessThanOrEqualTo("name", lowerCaseSearchTerm + "\uf8ff");
 
-   
     ApiFuture<QuerySnapshot> future = query.get();
     List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
+    List<ProductWithSaveStatusDTO> result = new ArrayList<>();
+    List<String> savedProductIds = user != null ? user.getSavedProductIds() : Collections.emptyList();
 
-    List<Product> products = new ArrayList<>();
     for (QueryDocumentSnapshot document : documents) {
-        products.add(document.toObject(Product.class));
+        Product product = document.toObject(Product.class);
+        boolean isSaved = savedProductIds.contains(product.getProductId());
+        result.add(new ProductWithSaveStatusDTO(product, isSaved));
     }
 
-    return products;
+    return result;
 }
-
-
 
 
 public Product updateUserReview(String productId, String userId, int newRating) 
