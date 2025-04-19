@@ -1,11 +1,14 @@
 package com.flawlessyou.backend.entity.product;
 
+import com.flawlessyou.backend.controllers.ProductController;
 import com.flawlessyou.backend.entity.user.User;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 
 import jakarta.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,7 +19,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
+
+import java.util.stream.Collectors;
 import java.util.Collections;
 import java.util.HashMap;
 @Service
@@ -84,24 +91,70 @@ public class ProductService {
 
 //     return randomProducts;
 // }
-public List<ProductWithSaveStatusDTO> getRandomProductsWithSaveStatus(int limit, User user) 
-    throws ExecutionException, InterruptedException {
+
+
+
+// public List<ProductWithSaveStatusDTO> getRandomProductsWithSaveStatus(int limit, User user) 
+//     throws ExecutionException, InterruptedException {
     
-    Query query = firestore.collection(COLLECTION_NAME).limit(limit); 
-    ApiFuture<QuerySnapshot> future = query.get();
-    List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+//     Query query = firestore.collection(COLLECTION_NAME).limit(limit); 
+//     ApiFuture<QuerySnapshot> future = query.get();
+//     List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
-    List<ProductWithSaveStatusDTO> result = new ArrayList<>();
-    List<String> savedProductIds = user != null ? user.getSavedProductIds() : Collections.emptyList();
+//     List<ProductWithSaveStatusDTO> result = new ArrayList<>();
+//     List<String> savedProductIds = user != null ? user.getSavedProductIds() : Collections.emptyList();
 
-    for (QueryDocumentSnapshot document : documents) {
-        Product product = document.toObject(Product.class);
-        boolean isSaved = savedProductIds.contains(product.getProductId()); 
-        result.add(new ProductWithSaveStatusDTO(product, isSaved));
+//     for (QueryDocumentSnapshot document : documents) {
+//         Product product = document.toObject(Product.class);
+//         boolean isSaved = savedProductIds.contains(product.getProductId()); 
+//         result.add(new ProductWithSaveStatusDTO(product, isSaved));
+//     }
+
+//     return result;
+// }
+   private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
+
+public List<ProductWithSaveStatusDTO> getRandomProductsWithSaveStatus(int limit, User user) {
+    try {
+        logger.debug("Fetching {} random products for user {}", limit, user != null ? user.getUserId() : "anonymous");
+        
+        // 1. جلب جميع المنتجات مرة واحدة
+        List<Product> allProducts = getAllProducts();
+        
+        if (allProducts.isEmpty()) {
+            logger.info("No products available in database");
+            return Collections.emptyList();
+        }
+        
+        // 2. استخدام Stream API لتحسين الأداء
+        List<String> savedProductIds = Optional.ofNullable(user)
+                .map(User::getSavedProductIds)
+                .orElse(Collections.emptyList());
+        
+        logger.debug("User has {} saved products", savedProductIds.size());
+        
+        // 3. اختيار عشوائي باستخدام Stream
+        List<ProductWithSaveStatusDTO> result = new Random()
+                .ints(Math.min(limit, allProducts.size()), 0, allProducts.size())
+                .distinct()
+                .mapToObj(i -> allProducts.get(i))
+                .map(product -> {
+                    boolean isSaved = product.getProductId() != null && 
+                                    savedProductIds.contains(product.getProductId());
+                    return new ProductWithSaveStatusDTO(product, isSaved);
+                })
+                .collect(Collectors.toList());
+        
+        logger.info("Successfully returned {} random products", result.size());
+        return result;
+        
+    } catch (Exception e) {
+        logger.error("Error in getRandomProductsWithSaveStatus: {}", e.getMessage(), e);
+        throw new RuntimeException("Failed to get random products", e);
     }
-
-    return result;
 }
+
+
 public Product updateProduct(Product product) throws ExecutionException, InterruptedException {
     if (product.getProductId() == null || product.getProductId().isEmpty()) {
         throw new IllegalArgumentException("Product ID cannot be null or empty");

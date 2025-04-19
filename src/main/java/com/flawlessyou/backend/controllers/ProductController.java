@@ -44,6 +44,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -72,24 +74,26 @@ public class ProductController {
          return ResponseEntity.internalServerError().build();
      }
  }
-
 @GetMapping("/random")
 public ResponseEntity<?> getRandomProducts(
-        @RequestParam(defaultValue = "6") int limit,  HttpServletRequest request) { 
+        @RequestParam(defaultValue = "6") @Min(1) @Max(50) int limit,
+        HttpServletRequest request) {
     try {
         User admin = getUser.userFromToken(request);
         if (admin == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("User not found or invalid token");
         }
-        List<ProductWithSaveStatusDTO> randomProducts = productService.getRandomProductsWithSaveStatus(limit,admin);
-        return ResponseEntity.ok(randomProducts);
+        
+        List<ProductWithSaveStatusDTO> products = productService.getRandomProductsWithSaveStatus(limit, admin);
+        return ResponseEntity.ok(products);
     } catch (Exception e) {
+        String errorMessage = "Error occurred: " + (e.getMessage() != null ? e.getMessage() : e.getMessage());
+        System.err.println("API Error: " + errorMessage); // Log للتصحيح
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-               .body("Error: " + e.getMessage());
+                .body(errorMessage);
     }
 }
-
-
 @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createProduct(
             @RequestBody Product product,
