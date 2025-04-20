@@ -158,6 +158,17 @@ public ResponseEntity<?> getRandomProducts(
                    .body("Error: " + e.getMessage());
         }
     }
+
+
+
+    @DeleteMapping("/{productId}/photos/{index}")
+public ResponseEntity<?> removePhotoQuick(
+        @PathVariable String productId,
+        @PathVariable int index) throws Exception {
+    
+    Product product = productService.removeProductPhotoByIndex(productId, index);
+    return ResponseEntity.ok(product);
+}
     @PostMapping(value = "/{productId}/review")
     public ResponseEntity<?> addReview(
         @PathVariable String productId,
