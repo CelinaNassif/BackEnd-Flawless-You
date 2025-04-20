@@ -405,7 +405,34 @@ public Product updateUserReview(String productId, String userId, int newRating)
 
     return productRef.get().get().toObject(Product.class);
 }
-
+public Product removeProductPhotoByIndex(String productId, int index) 
+    throws ExecutionException, InterruptedException {
+    
+    DocumentReference productRef = firestore.collection(COLLECTION_NAME).document(productId);
+    DocumentSnapshot snapshot = productRef.get().get();
+    
+    if (!snapshot.exists()) {
+        throw new IllegalArgumentException("Product not found");
+    }
+    
+    List<String> photos = (List<String>) snapshot.get("photos");
+    
+    if (photos == null || photos.isEmpty()) {
+        throw new IllegalArgumentException("No photos available");
+    }
+    
+    if (index < 0 || index >= photos.size()) {
+        throw new IndexOutOfBoundsException("Invalid photo index");
+    }
+    
+    String photoUrl = photos.get(index);
+    photos.remove(index);
+    
+    // تحديث مباشر للقائمة الجديدة بدون استخدام arrayRemove
+    productRef.update("photos", photos).get();
+    
+    return productRef.get().get().toObject(Product.class);
+}
 
 
 }
