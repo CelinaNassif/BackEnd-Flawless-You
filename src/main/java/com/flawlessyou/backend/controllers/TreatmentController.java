@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,9 +14,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.flawlessyou.backend.config.GetUser;
 import com.flawlessyou.backend.entity.product.Product;
+import com.flawlessyou.backend.entity.product.ProductWithSaveStatusDTO;
 import com.flawlessyou.backend.entity.treatments.Treatment;
 import com.flawlessyou.backend.entity.treatments.TreatmentService;
+import com.flawlessyou.backend.entity.user.User;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.web.bind.annotation.RequestBody;
 // import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
@@ -23,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class TreatmentController {
      @Autowired
     private TreatmentService treatmentService;
+@Autowired
+ private GetUser getUser ;
 
     @PostMapping
     public String createTreatment(@RequestBody Treatment treatment) throws ExecutionException, InterruptedException {
@@ -56,8 +66,15 @@ public class TreatmentController {
     }
     
     @GetMapping("/{treatmentId}/products")
-public List<Product> getProductsForTreatment(@PathVariable String treatmentId) throws ExecutionException, InterruptedException {
-    return treatmentService.getProductsForTreatment(treatmentId);
+public ResponseEntity<?> getProductsForTreatment(@PathVariable String treatmentId, HttpServletRequest request) throws Exception {
+   
+   
+        User admin = getUser.userFromToken(request);
+        if (admin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("User not found or invalid token");
+        }
+    return ResponseEntity.ok( treatmentService.getProductsForTreatment(treatmentId,admin));
 }
 
 @PostMapping("/{treatmentId}/products/{productId}/{productName}")

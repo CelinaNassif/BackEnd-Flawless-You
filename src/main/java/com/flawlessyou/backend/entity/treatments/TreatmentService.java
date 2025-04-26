@@ -1,9 +1,11 @@
 package com.flawlessyou.backend.entity.treatments;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import com.flawlessyou.backend.config.GetUser;
 import com.flawlessyou.backend.entity.product.Product;
+import com.flawlessyou.backend.entity.product.ProductWithSaveStatusDTO;
+import com.flawlessyou.backend.entity.user.User;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -81,6 +85,9 @@ public class TreatmentService {
             if (updatedTreatment.getProductIds() != null) {
                 existingTreatment.setProductIds(updatedTreatment.getProductIds());
             }
+            if (updatedTreatment.getProblem() != null) {
+                existingTreatment.setProblem(updatedTreatment.getProblem());
+            }
         
             // 5. حفظ العلاج المحدث في Firestore
             ApiFuture<WriteResult> updateFuture = docRef.set(existingTreatment);
@@ -115,35 +122,46 @@ public class TreatmentService {
         }
         return treatments;
     }
+public List<ProductWithSaveStatusDTO> getProductsForTreatment(String treatmentId, User user)
+        throws ExecutionException, InterruptedException {
 
-    public List<Product> getProductsForTreatment(String treatmentId) throws ExecutionException, InterruptedException {
-        // 1. Get treatment by treatmentId
-        Treatment treatment = getTreatment(treatmentId);
-        if (treatment == null) {
-            throw new RuntimeException("Treatment not found with ID: " + treatmentId);
-        }
-    
-        // 2. Get productIds map from treatment
-        Map<String, String> productIds = treatment.getProductIds();
-        if (productIds == null || productIds.isEmpty()) {
-            return new ArrayList<>(); // Return empty list if no products
-        }
-    
-        // 3. Fetch products from Firestore based on productIds (map keys)
-        List<Product> products = new ArrayList<>();
-        for (String productId : productIds.keySet()) {  // Iterate through map keys
-            DocumentReference docRef = firestore.collection("products").document(productId);
-            ApiFuture<DocumentSnapshot> future = docRef.get();
-            DocumentSnapshot document = future.get();
-    
-            if (document.exists()) {
-                products.add(document.toObject(Product.class));
-            }
-        }
-    
-        return products;
+    // 1. جلب المعالجة حسب المعرف
+    Treatment treatment = getTreatment(treatmentId);
+    if (treatment == null) {
+        throw new RuntimeException("Treatment not found with ID: " + treatmentId);
     }
-public String addProductToTreatment(String treatmentId, String productId, String productName) throws ExecutionException, InterruptedException {
+
+    // 2. جلب معرفات المنتجات من المعالجة
+    Map<String, String> productIds = treatment.getProductIds();
+    if (productIds == null || productIds.isEmpty()) {
+        return new ArrayList<>(); // إذا ما في منتجات
+    }
+
+    // 3. تجهيز قائمة معرفات المنتجات المحفوظة للمستخدم
+    List<String> savedProductIds = Optional.ofNullable(user)
+            .map(User::getSavedProductIds)
+            .orElse(Collections.emptyList());
+
+    // 4. جلب المنتجات وتحويلها إلى DTO
+    List<ProductWithSaveStatusDTO> result = new ArrayList<>();
+    for (String productId : productIds.keySet()) {
+        DocumentReference docRef = firestore.collection("products").document(productId);
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+        DocumentSnapshot document = future.get();
+
+        if (document.exists()) {
+            Product product = document.toObject(Product.class);
+            boolean isSaved = product.getProductId() != null &&
+                              savedProductIds.contains(product.getProductId());
+            result.add(new ProductWithSaveStatusDTO(product, isSaved));
+        }
+    }
+
+    return result;
+}
+
+
+    public String addProductToTreatment(String treatmentId, String productId, String productName) throws ExecutionException, InterruptedException {
     Treatment treatment = getTreatment(treatmentId);
     if (treatment == null) {
         throw new RuntimeException("Treatment not found with ID: " + treatmentId);

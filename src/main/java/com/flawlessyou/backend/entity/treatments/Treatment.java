@@ -22,6 +22,13 @@ public class Treatment {
         this.productIds = productIds;
         this.problem=problem;
     }
+    // public Treatment( Type skinType, String description, Problem problem) {
+    //     this.treatmentId = UUID.randomUUID().toString();
+    //     this.skinType = skinType;
+    //     this.description = description;
+      
+    //     this.problem=problem;
+    // }
 
     
     
