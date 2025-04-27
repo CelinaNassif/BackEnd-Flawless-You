@@ -196,4 +196,5 @@ public String removeProductFromTreatment(String treatmentId, String productId) t
     ApiFuture<WriteResult> future = firestore.collection(COLLECTION_NAME).document(treatmentId).set(treatment);
     return future.get().getUpdateTime().toString();
 }
+
 }

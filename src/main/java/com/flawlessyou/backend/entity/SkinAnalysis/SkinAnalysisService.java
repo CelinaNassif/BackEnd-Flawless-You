@@ -9,6 +9,9 @@ import com.flawlessyou.backend.entity.treatments.Treatment;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -193,4 +196,33 @@ public class SkinAnalysisService {
     
         return productsByProblem;
     }
+
+
+    public SkinAnalysis getLatestSkinAnalysisByUserId(String userId) throws ExecutionException, InterruptedException {
+        try {
+            ApiFuture<QuerySnapshot> future = firestore.collection("skinAnalysis")
+                    .whereEqualTo("userId", userId)
+                    .get();
+    
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            
+            if (documents.isEmpty()) {
+                return null;
+            }
+    
+            // البحث عن أحدث وثيقة باستخدام Timestamp
+            QueryDocumentSnapshot latestDoc = documents.stream()
+                    .max(Comparator.comparing(doc -> doc.getTimestamp("createdAt")))
+                    .orElseThrow();
+    
+            return latestDoc.toObject(SkinAnalysis.class);
+        } catch (Exception e) {
+            logger.severe("Error getting latest analysis: " + e.getMessage());
+            throw e;
+        }
+    }
+
+
+
+
 }

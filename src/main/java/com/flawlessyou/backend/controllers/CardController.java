@@ -6,6 +6,8 @@ import com.flawlessyou.backend.entity.card.cardService;
 import com.flawlessyou.backend.entity.user.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,5 +58,18 @@ public class CardController {
     public List<Card> getCardsByUserId(HttpServletRequest request) throws Exception {
      
         return cardService.getCardsByUserId(request);
+    }
+    @PostMapping("/sendWithAnalysis")
+    public ResponseEntity<String> sendCardWithAnalysis(
+            @RequestParam String message,
+            @RequestParam String name,
+            HttpServletRequest request) {
+        try {
+            String result = cardService.sendCardWithLatestAnalysis(message, name, request);
+            return ResponseEntity.ok("Card sent successfully with latest analysis: " + result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error sending card: " + e.getMessage());
+        }
     }
 }

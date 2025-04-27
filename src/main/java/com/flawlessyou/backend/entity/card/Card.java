@@ -4,10 +4,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.flawlessyou.backend.entity.SkinAnalysis.SkinAnalysis;
+
 public class Card {
 
     private String id; 
-    private String senderId; 
+    private String senderName; 
     private String expertId; 
     private String message; 
     private Date sentDate; 
@@ -15,10 +17,10 @@ public class Card {
     private Date replyDate;
     private String expertName; 
     private boolean isEdit;
-    private String skinAnalysiId;
+    private SkinAnalysis SkinAnalysis;
 
-    public String getSkinAnalysiId() {
-        return skinAnalysiId;
+    public SkinAnalysis getSkinAnalysis() {
+        return SkinAnalysis;
     }
 
 
@@ -27,8 +29,8 @@ public class Card {
 
 
 
-    public void setSkinAnalysiId(String skinAnalysiId) {
-        this.skinAnalysiId = skinAnalysiId;
+    public void setSkinAnalysis(SkinAnalysis SkinAnalysis) {
+        this.SkinAnalysis = SkinAnalysis;
     }
 
 
@@ -59,11 +61,11 @@ public class Card {
     public void setId(String id) {
         this.id = id;
     }
-    public String getSenderId() {
-        return senderId;
+    public String getsenderName() {
+        return senderName;
     }
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
+    public void setsenderName(String senderName) {
+        this.senderName = senderName;
     }
     public String getExpertId() {
         return expertId;

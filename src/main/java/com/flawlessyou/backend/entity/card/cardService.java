@@ -1,6 +1,8 @@
 package com.flawlessyou.backend.entity.card;
 
 import com.flawlessyou.backend.config.GetUser;
+import com.flawlessyou.backend.entity.SkinAnalysis.SkinAnalysis;
+import com.flawlessyou.backend.entity.SkinAnalysis.SkinAnalysisService;
 import com.flawlessyou.backend.entity.user.User;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
@@ -20,6 +22,9 @@ import java.util.concurrent.ExecutionException;
 public class cardService {
       @Autowired
 private GetUser getUser;
+
+@Autowired
+private  SkinAnalysisService SkinAnalysisService;
     private static final String COLLECTION_NAME = "cards";
 
     // إرسال بطاقة من المستخدم العادي إلى خبير البشرة
@@ -27,7 +32,7 @@ private GetUser getUser;
         Firestore dbFirestore = FirestoreClient.getFirestore();
         card.setSentDate(new Date());
         User user = getUser.userFromToken(request);
-        card.setSenderId(user.getUserId());
+        card.setsenderName(user.getUserName());
       
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection(COLLECTION_NAME).document(card.getId()).set(card);
         return collectionsApiFuture.get().getUpdateTime().toString();
@@ -82,7 +87,7 @@ private GetUser getUser;
        
         Firestore dbFirestore = FirestoreClient.getFirestore();
         CollectionReference cardsCollection = dbFirestore.collection(COLLECTION_NAME);
-        Query query = cardsCollection.whereEqualTo("expertId", getUser.userFromToken(request).getUserId());
+        Query query = cardsCollection.whereEqualTo("expertName", getUser.userFromToken(request).getUserName());
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
 
         List<Card> cards = new ArrayList<>();
@@ -108,4 +113,69 @@ private GetUser getUser;
         }
         return cards;
     }
+
+
+//     public String createCardWithLatestAnalysis(Card card, HttpServletRequest request) throws Exception {
+//     try {
+//         // 1. الحصول على بيانات المستخدم
+//         User user = getUser.userFromToken(request);
+//         card.setSenderId(user.getUserId());
+//         card.setSentDate(new Date());
+        
+//         // 2. الحصول على آخر تحليل للبشرة للمستخدم
+//         SkinAnalysis latestAnalysis = SkinAnalysisService.getLatestSkinAnalysisByUserId(user.getUserId());
+        
+//         if (latestAnalysis != null) {
+//             // 3. ربط الكارد بآخر تحليل
+//             card.setSkinAnalysiId(latestAnalysis.getId());
+            
+//             // 4. حفظ الكارد في Firestore
+//             Firestore dbFirestore = FirestoreClient.getFirestore();
+//             ApiFuture<WriteResult> future = dbFirestore.collection(COLLECTION_NAME)
+//                     .document(card.getId())
+//                     .set(card);
+            
+//             return future.get().getUpdateTime().toString();
+//         } else {
+//             throw new Exception("User has no skin analysis available");
+//         }
+//     } catch (Exception e) {
+//         throw new Exception("Error creating card with latest analysis: " + e.getMessage(), e);
+//     }
+// }
+
+
+public String sendCardWithLatestAnalysis(String message, String name, HttpServletRequest request) throws Exception {
+    try {
+        // 1. إنشاء كارد جديدة وتعيين القيم الأساسية
+        Card card = new Card();
+        card.setMessage(message);
+        card.setExpertName(name);
+        
+        // 2. الحصول على بيانات المستخدم من التوكن
+        User user = getUser.userFromToken(request);
+        card.setsenderName(user.getUserName());
+        card.setSentDate(new Date());
+        
+        // 3. الحصول على آخر تحليل للبشرة للمستخدم
+        SkinAnalysis latestAnalysis = SkinAnalysisService.getLatestSkinAnalysisByUserId(user.getUserId());
+        
+        if (latestAnalysis != null) {
+            // 4. ربط الكارد بآخر تحليل
+            card.setSkinAnalysis(latestAnalysis);
+            
+            // 5. حفظ الكارد في Firestore
+            Firestore dbFirestore = FirestoreClient.getFirestore();
+            ApiFuture<WriteResult> future = dbFirestore.collection(COLLECTION_NAME)
+                    .document(card.getId())
+                    .set(card);
+            
+            return future.get().getUpdateTime().toString();
+        } else {
+            throw new Exception("User has no skin analysis available");
+        }
+    } catch (Exception e) {
+        throw new Exception("Error sending card with latest analysis: " + e.getMessage(), e);
+    }
+}
 }

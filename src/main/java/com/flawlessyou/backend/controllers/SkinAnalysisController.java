@@ -85,4 +85,20 @@ public class SkinAnalysisController {
             return skinAnalysisService.getProductsBySkinAnalysisId(skinAnalysisId);
        
     }
+
+    @GetMapping("/latest")
+    public ResponseEntity<?> getLatestSkinAnalysis(  HttpServletRequest request) {
+        try {
+            User user = getUser.userFromToken(request);
+            SkinAnalysis latestAnalysis = skinAnalysisService.getLatestSkinAnalysisByUserId(user.getUserId());
+            if (latestAnalysis != null) {
+                return ResponseEntity.ok(latestAnalysis);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error retrieving skin analysis: " + e.getMessage());
+        }
+    }
+
 }

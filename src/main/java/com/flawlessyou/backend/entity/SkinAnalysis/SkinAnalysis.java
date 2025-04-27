@@ -9,6 +9,7 @@ import java.util.Date;
 import com.flawlessyou.backend.entity.product.Type;
 import com.flawlessyou.backend.entity.treatments.Problem;
 import com.flawlessyou.backend.entity.treatments.Treatment;
+import com.google.cloud.firestore.annotation.ServerTimestamp;
 
 public class SkinAnalysis {
     private String id;
@@ -17,7 +18,9 @@ public class SkinAnalysis {
     private Map<String, Double> problems;
     private List<Treatment> treatmentId;
     private String imageUrl;
-    private Date createdAt; // Added timestamp field
+
+      @ServerTimestamp
+    private Date createdAt; 
 
     // Constructor
     public SkinAnalysis(String userId, Type skintype, Map<Problem, Double> problems) {
