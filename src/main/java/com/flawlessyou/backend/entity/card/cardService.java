@@ -104,7 +104,7 @@ private  SkinAnalysisService SkinAnalysisService;
         
         Firestore dbFirestore = FirestoreClient.getFirestore();
         CollectionReference cardsCollection = dbFirestore.collection(COLLECTION_NAME);
-        Query query = cardsCollection.whereEqualTo("senderId", getUser.userFromToken(request).getUserId());
+        Query query = cardsCollection.whereEqualTo("senderName", getUser.userFromToken(request).getUserName());
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
 
         List<Card> cards = new ArrayList<>();
