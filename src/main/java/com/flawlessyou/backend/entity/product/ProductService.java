@@ -433,6 +433,28 @@ public Product removeProductPhotoByIndex(String productId, int index)
     
     return productRef.get().get().toObject(Product.class);
 }
+public String getProductIdByName(String productName) throws Exception {
+        if (productName == null || productName.isEmpty()) {
+            throw new IllegalArgumentException("Product name cannot be null or empty");
+        }
+
+        try {
+            List<QueryDocumentSnapshot> documents = firestore.collection("products")
+                    .whereEqualTo("name", productName)
+                    .limit(1)
+                    .get()
+                    .get()
+                    .getDocuments();
+
+            if (!documents.isEmpty()) {
+                return documents.get(0).getId(); // أو getString("productId") حسب التخزين
+            } else {
+                throw new RuntimeException("Product not found with name: " + productName);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new Exception("Failed to fetch product ID by name: " + e.getMessage());
+        }
+    }
 
 
 }

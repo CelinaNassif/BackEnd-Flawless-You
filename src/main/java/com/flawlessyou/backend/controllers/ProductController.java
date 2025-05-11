@@ -462,7 +462,18 @@ public List<ProductWithSaveStatusDTO> searchProductsByName(
 
 
 
-    
+     @GetMapping("/by-name")
+    public ResponseEntity<?> getProductIdByName(@RequestParam String name) {
+        try {
+            String productId = productService.getProductIdByName(name);
+            return ResponseEntity.ok().body(Map.of("productId", productId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "error", e.getMessage(),
+                "status", 400
+            ));
+        }
+    }
 }
 
 

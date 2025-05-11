@@ -185,62 +185,64 @@ public class RoutineService {
 
 public Map<RoutineTime, List<Product>> getRoutineWithProductsByTime(HttpServletRequest request) throws Exception {
     try {
-        // 1. التحقق من المستخدم - O(1)
         User user = getUser.userFromToken(request);
         if (user == null) {
             throw new IllegalArgumentException("User not found or invalid token.");
         }
 
-        // 2. التحقق من وجود الروتين - O(1)
         String routineId = user.getRoutineId();
         if (routineId == null || routineId.isEmpty()) {
             throw new IllegalArgumentException("Routine ID must be a non-empty string.");
         }
 
-        // 3. جلب الروتين - O(1) (يفترض وجود cache)
         Routine routine = getRoutineById(routineId);
         if (routine == null) {
             throw new RuntimeException("Routine not found with ID: " + routineId);
         }
 
-        // 4. التحقق من وجود منتجات - O(1)
+        // Debug: Print routine product IDs
+        System.out.println("Routine Product IDs: " + routine.getProductIds());
+
         if (routine.getProductIds() == null || routine.getProductIds().isEmpty()) {
+            System.out.println("No product IDs in routine");
             return initializeEmptyTimeMap();
         }
 
-        // 5. تقسيم المنتجات إلى مجموعات لتجنب حدود Firestore (10 لكل مجموعة)
         List<List<String>> productIdBatches = partitionList(routine.getProductIds(), 10);
-
-        // 6. تنفيذ استعلامات متوازية لكل مجموعة
         List<ApiFuture<QuerySnapshot>> futures = new ArrayList<>();
+
         for (List<String> batch : productIdBatches) {
             Query query = firestore.collection("products")
                 .whereIn("productId", batch);
             futures.add(query.get());
         }
 
-        // 7. معالجة النتائج وتصنيفها حسب الوقت
         Map<RoutineTime, List<Product>> productsByTime = initializeEmptyTimeMap();
         
         for (ApiFuture<QuerySnapshot> future : futures) {
             List<QueryDocumentSnapshot> productDocuments = future.get().getDocuments();
+            System.out.println("Fetched products count: " + productDocuments.size());
             
             for (QueryDocumentSnapshot doc : productDocuments) {
                 Product product = doc.toObject(Product.class);
+                System.out.println("Product ID: " + product.getProductId() + ", Usage Time: " + product.getUsageTime());
+                
                 if (product.getUsageTime() != null) {
                     for (RoutineTime time : product.getUsageTime()) {
                         productsByTime.get(time).add(product);
                     }
+                } else {
+                    System.out.println("Product has no usage time: " + product.getProductId());
                 }
             }
         }
 
         return productsByTime;
     } catch (Exception e) {
+        System.err.println("Error in getRoutineWithProductsByTime: " + e.getMessage());
         throw e;
     }
 }
-
 // دالة مساعدة لتهيئة خريطة الأوقات الفارغة
 private Map<RoutineTime, List<Product>> initializeEmptyTimeMap() {
     Map<RoutineTime, List<Product>> map = new EnumMap<>(RoutineTime.class);
